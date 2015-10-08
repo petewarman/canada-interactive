@@ -15,6 +15,15 @@ $cat-1-color: #00CE9D; //3c9;
 $cat-2-color: #F46300; //d63;
 $cat-3-color: #FFB31A; //ec3;
 
+@mixin tile-element-sizer($font-size, $leading) {
+	font-size: #{ $font-size }px;
+	line-height: ($font-size + ($leading * 2)) / $font-size;
+
+	.tile__text-holder {
+		padding: #{ $leading }px 0;
+	}
+}
+
 body, html {
 	margin: 0;
 	padding: 0;
@@ -46,7 +55,7 @@ body, html {
 }
 
 .header__description {
-	padding: $header-padding--vertical $header-padding--horizontal;
+	padding: $header-padding--vertical $header-padding--horizontal 0;
 	font-size: 18px;
 	line-height: 1.25;
 }
@@ -62,11 +71,11 @@ body, html {
 	}
 
 	.is-portrait & {
-		padding: 0 $header-padding--horizontal/2 $header-padding--vertical $header-padding--horizontal/2;
+		padding: 10px $header-padding--horizontal/2 $header-padding--vertical $header-padding--horizontal/2;
 	}
 
 	.is-landscape & {
-		padding: $header-padding--vertical 0;
+		padding: 0;
 	}
 }
 
@@ -82,7 +91,7 @@ body, html {
 
 	.is-landscape & {
 		text-align: left;
-		margin: $header-padding--vertical 0;
+		margin: 30px 0;
 	}
 }
 
@@ -311,16 +320,8 @@ body, html {
 	padding: 0 $text-padding;
 	margin: 10px 0 20px;
 	font-weight: bold;
+	@include tile-element-sizer(14, 2);
 
-	$font-size: 14;
-	$leading: 2; 
-
-	font-size: #{ $font-size }px;
-	line-height: ($font-size + ($leading * 2)) / $font-size;
-
-	.tile__text-holder {
-		padding: #{ $leading }px 0;
-	}
 }
 
 .tile__date {
@@ -328,16 +329,7 @@ body, html {
 	text-transform: uppercase;
 	padding: 0 $text-padding;
 	margin-bottom: 20px;
-
-	$font-size: 12;
-	$leading: 2; 
-
-	font-size: #{ $font-size }px;
-	line-height: ($font-size + ($leading * 2)) / $font-size;
-
-	.tile__text-holder {
-		padding: #{ $leading }px 0;
-	}
+	@include tile-element-sizer(12, 2);
 }
 
 .tile__description {
@@ -345,16 +337,7 @@ body, html {
 	padding: 0 $text-padding;
 	margin-bottom: 20px;
 	font-weight: bold;
-
-	$font-size: 12;
-	$leading: 3; 
-
-	font-size: #{ $font-size }px;
-	line-height: ($font-size + ($leading * 2)) / $font-size;
-
-	.tile__text-holder {
-		padding: #{ $leading }px 0;
-	}
+	@include tile-element-sizer(12, 2);
 }
 
 .tile__links {
@@ -366,16 +349,7 @@ body, html {
 	display: inline-block;
 	padding: 0 $text-padding;
 	font-style: italic;
-
-	$font-size: 12;
-	$leading: 3; 
-
-	font-size: #{ $font-size }px;
-	line-height: ($font-size + ($leading * 2)) / $font-size;
-
-	.tile__text-holder {
-		padding: #{ $leading }px 0;
-	}
+	@include tile-element-sizer(12, 2);
 }
 
 .tile__link {
@@ -388,15 +362,13 @@ body, html {
 	right: 10px;
 	top: 10px;
 	max-width: 50%;
-	width: 120px;
-	height: 120px;
+	width: 100px;
+	height: 100px;
 	border-radius: 50%;
 
 	.cat-1 & { background: $cat-1-color; }
 	.cat-2 & { background: $cat-2-color; }
 	.cat-3 & { background: $cat-3-color; }
-
-
 }
 
 .tile__location-text {
@@ -405,14 +377,32 @@ body, html {
 	position: absolute;
 	top: 10%;
 	right: 65%;
+	@include tile-element-sizer(11, 2);
+}
 
-	$font-size: 11;
-	$leading: 2; 
-
-	font-size: #{ $font-size }px;
-	line-height: ($font-size + ($leading * 2)) / $font-size;
-
-	.tile__text-holder {
-		padding: #{ $leading }px 0;
+@media screen and (min-height: 450px) {
+	.is-landscape {
+		.header__title {}
+		.header__description {}
+		.header__category-button .text {}
+		.header__category-button .icon {}
 	}
+}
+
+@media screen and (min-height: 521px) and (min-width: 521px) {
+	.tile__title { @include tile-element-sizer(18, 3); }
+	.tile__date { @include tile-element-sizer(14, 2); }
+	.tile__description { @include tile-element-sizer(14, 2); }
+	.tile__link-item { @include tile-element-sizer(14, 2); }
+	.tile__location-text { @include tile-element-sizer(14, 2); }
+	.tile__location { width: 120px; height: 120px; }
+}
+
+@media screen and (min-height: 600px) and (min-width: 600px) {
+	.tile__title { @include tile-element-sizer(24, 3); }
+	.tile__date { @include tile-element-sizer(20, 2); }
+	.tile__description { @include tile-element-sizer(20, 2); }
+	.tile__link-item { @include tile-element-sizer(20, 2); }
+	.tile__location-text { @include tile-element-sizer(20, 2); }
+	.tile__location { width: 150px; height: 150px; }
 }
