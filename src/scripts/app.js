@@ -33,9 +33,6 @@ define([
 		"init": function(options) {
 
 			var defaults = {
-				"tilesPerAxisBreakPoint": 450,
-				"gutter": 10,
-				"landscapeMaxHeight": 600
 			};
 
 			this.options = _.extend(defaults, options); 
