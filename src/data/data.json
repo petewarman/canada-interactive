@@ -4,15 +4,18 @@
 	"categories": [
 		{
 			"id": 1,
-			"text": "best to see"
+			"text": "best to see",
+			"icon": "eye"
 		},
 		{
 			"id": 2,
-			"text": "best to Eat"
+			"text": "best to Eat",
+			"icon": "cutlery"
 		},
 		{
 			"id": 3,
-			"text": "best to Do"
+			"text": "best to Do",
+			"icon": "walk"
 		}
 	],
 	"tiles": [

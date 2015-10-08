@@ -7,11 +7,11 @@ $gutter: 10px;
 $text-padding: 8px;
 
 // colors
-$canada-red: #922;
+$canada-red: #B12009;
 $white: #fff;
-$cat-1-color: #3c9;
-$cat-2-color: #d63;
-$cat-3-color: #ec3;
+$cat-1-color: #00CE9D; //3c9;
+$cat-2-color: #F46300; //d63;
+$cat-3-color: #FFB31A; //ec3;
 
 body, html {
 	margin: 0;
@@ -92,17 +92,23 @@ body, html {
 	margin: 0;
 	cursor: pointer;
 
-	&:before {
-		content: 'I';
+	.icon {
 		position: absolute;
-		font-size: 30px;
-		line-height: 1;
-		width: 1em;
-		height: 1em;
-		padding: 5px;
+		width: 40px;
+		height: 40px;
 		border-radius: 50%;
 		background: $cat-1-color;
 		color: rgba(0,0,0,0.5);
+
+		img {
+			opacity: 0.5;
+			position: absolute;
+			max-width: 65%;
+			max-height: 65%;
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%, -50%);
+		}
 	}
 
 	.text {
@@ -139,7 +145,7 @@ body, html {
 	.is-portrait & {
 		padding: 50px 0 0;
 
-		&:before {
+		.icon {
 			left: 50%;
 			top: 0;
 			margin-left: -20px;
@@ -156,7 +162,7 @@ body, html {
 			text-align: center;
 		}
 
-		&:before {
+		.icon {
 			top: 50%;
 			left: 10px;
 			margin-top: -20px;
@@ -182,22 +188,19 @@ body, html {
 }
 
 .header__category-button--1 {
-	&:before {
-		content: 'S';
+	.icon {
 		background: $cat-1-color;
 	}
 }
 
 .header__category-button--2 {
-	&:before {
-		content: 'E';
+	.icon {
 		background: $cat-2-color;
 	}
 }
 
 .header__category-button--3 {
-	&:before {
-		content: 'D';
+	.icon {
 		background: $cat-3-color;
 	}
 }

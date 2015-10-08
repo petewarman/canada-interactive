@@ -7,6 +7,9 @@
 			{{#each categories}}
 				<li class="header__category-item">
 					<button data-tile-class="cat-{{ this.id }}" type="button" class="header__category-button header__category-button--{{ this.id }}">
+						<span class="icon">
+							<img src="icons/{{ this.icon }}.svg" />
+						</span>
 						<span class="text">{{ this.text }}</span>
 					</button>
 				</li>

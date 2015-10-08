@@ -33,6 +33,11 @@ gulp.task('sass', function () {
 		.pipe($.connect.reload());
 });
 
+gulp.task('icons', function(){
+	gulp.src('./src/icons/*.svg')
+		.pipe(gulp.dest('./dist/icons'));
+});
+
 gulp.task('json', function(){
 	gulp.src('./src/data/*.json')
 		.pipe(gulp.dest('./dist/data'));
@@ -61,7 +66,7 @@ gulp.task('scripts', ['requirejs'], function() {
 });
 
 gulp.task('build', ['clean'], function(){
-	gulp.start(['html', 'hbs', 'json', 'bootjs', 'sass', 'scripts']);
+	gulp.start(['html', 'icons', 'json', 'bootjs', 'sass', 'scripts']);
 });
 
 gulp.task('watch', function () {
@@ -71,6 +76,7 @@ gulp.task('watch', function () {
 	gulp.watch(['./src/templates/*.hbs'], ['hbs']);
 	gulp.watch(['./src/boot.js'], ['bootjs']);
 	gulp.watch(['./src/data/*.json'], ['json']);
+	gulp.watch(['./src/icons/*.svg'], ['icons']);
 });
 
 gulp.task('default', ['build', 'connectDist', 'connectDev', 'watch']);
