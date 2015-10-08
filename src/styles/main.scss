@@ -1,0 +1,408 @@
+// bower:scss
+// endbower
+
+@import 'reset';
+
+$gutter: 10px;
+$text-padding: 8px;
+
+// colors
+$canada-red: #922;
+$white: #fff;
+$cat-1-color: #3c9;
+$cat-2-color: #d63;
+$cat-3-color: #ec3;
+
+body, html {
+	margin: 0;
+	padding: 0;
+}
+
+.gallery-container {
+	//width: 80%;
+	margin: 0 auto;
+	overflow-x: auto;
+}
+
+.gallery {
+	border: $gutter solid #fff;
+	background: $white;
+}
+
+.header {
+	overflow: auto;
+	background: $canada-red;
+	color: $white;
+	box-sizing: border-box;
+}
+
+.header__title {
+	border-bottom: 1px solid $white;
+	padding: 10px;
+	font-size: 24px;
+}
+
+.header__description {
+	padding: 10px;
+	font-size: 18px;
+	line-height: 1.25;
+}
+
+.header__category-list {
+	list-style: none;
+	padding: 10px 5px;
+
+	&:after {
+		clear: both;
+		content: '';
+		display: block;
+	}
+
+	.is-portrait & {
+		padding: 10px 5px;
+	}
+
+	.is-landscape & {
+		padding: 10px 0;
+	}
+}
+
+.header__category-item {
+	box-sizing: border-box;
+
+	.is-portrait & {
+		text-align: center;
+		float:left;
+		width: 33.33%;
+		padding: 0 5px;
+	}
+
+	.is-landscape & {
+		text-align: left;
+		margin: 20px 0;
+	}
+}
+
+.header__category-button {
+	border: 0;
+	background: none;
+	color: $white;
+	font-family: inherit;
+	position: relative;
+	margin: 0;
+	cursor: pointer;
+
+	&:before {
+		content: 'I';
+		position: absolute;
+		font-size: 30px;
+		line-height: 1;
+		width: 1em;
+		height: 1em;
+		padding: 5px;
+		border-radius: 50%;
+		background: $cat-1-color;
+		color: rgba(0,0,0,0.5);
+	}
+
+	.text {
+		font-size: 16px;
+		display: inline-block;
+		border: 1px solid $white;
+		padding: 4px 8px;
+		line-height: 1;
+		text-transform: uppercase;
+		transition: all 0.3s;
+	}
+
+	&:hover {
+		.text {
+			text-decoration: underline;
+		}
+	}
+
+	&:focus {
+		outline: 0;
+
+		.text {
+			box-shadow: 0 0 5px rgba(255,255,255,0.95);
+		}
+	}
+
+	&.is-selected {
+		.text {
+			border-color: transparent;
+			background: rgba(0,0,0,0.5);
+		}
+	}
+
+	.is-portrait & {
+		padding: 50px 0 0;
+
+		&:before {
+			left: 50%;
+			top: 0;
+			margin-left: -20px;
+		}
+	}
+
+	.is-landscape & {
+		padding: 0 10px 0 60px;
+		display: block;
+		width: 100%;
+
+		.text {
+			display: block;
+			text-align: center;
+		}
+
+		&:before {
+			top: 50%;
+			left: 10px;
+			margin-top: -20px;
+		}
+
+		&.is-selected {
+			background: rgba(0,0,0,0.5);
+
+			.text {
+				border-color: transparent;
+				background: transparent;
+			}
+
+			&:focus {
+				box-shadow: 0 0 5px rgba(255,255,255,0.95);
+
+				.text {
+					box-shadow: none;
+				}
+			}
+		}
+	}
+}
+
+.header__category-button--1 {
+	&:before {
+		content: 'S';
+		background: $cat-1-color;
+	}
+}
+
+.header__category-button--2 {
+	&:before {
+		content: 'E';
+		background: $cat-2-color;
+	}
+}
+
+.header__category-button--3 {
+	&:before {
+		content: 'D';
+		background: $cat-3-color;
+	}
+}
+
+.tile {
+	position: relative;
+	transition: opacity 0.5s;
+
+	&.is-inactive {
+		opacity: 0.1;
+	}
+}
+
+.tile__img-holder {
+	position: absolute;
+	display: block;
+	width: 100%;
+	left: 0;
+	top: 0;
+
+	.layout-complete & {
+		transition: width 0.4s, height 0.4s;
+	}
+
+	img {
+		display: block;
+		width: 100%;
+		position: absolute;
+		left: 0;
+		top: 0;
+		transition: opacity 0.3s;
+	}
+
+	&:hover img {
+		opacity: 0.4;
+	}
+
+	.is-selected &:hover img {
+		opacity: 1;
+	}
+
+	.cat-1 & { background: $cat-1-color; }
+	.cat-2 & { background: $cat-2-color; }
+	.cat-3 & { background: $cat-3-color; }
+
+}
+
+.tile__details {
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	padding: 10px;
+	overflow: auto;
+	visibility: hidden;
+	opacity: 0;
+	transition: visibility 0s 0.2s, opacity 0.2s 0s;
+
+	.is-selected & {
+		visibility: visible;
+		opacity: 1;
+		transition: visibility 0s 0.4s, opacity 0.3s 0.4s;
+	}
+}
+
+.tile__text-holder {
+	display: inline;
+
+	.tile__title &,
+	.tile__date &,
+	.tile__location-text & {
+		background: $canada-red;
+		color: $white;
+		box-shadow: ($text-padding * -1) 0 0 $canada-red, $text-padding 0 0 $canada-red;
+	}
+
+	.cat-1 .tile__description &,
+	.cat-1 .tile__link-item & {
+		background: $cat-1-color;
+		box-shadow: ($text-padding * -1) 0 0 $cat-1-color, $text-padding 0 0 $cat-1-color;
+		color: $white;
+	}
+
+	.cat-2 .tile__description &,
+	.cat-2 .tile__link-item & {
+		background: $cat-2-color;
+		box-shadow: ($text-padding * -1) 0 0 $cat-2-color, $text-padding 0 0 $cat-2-color;
+		color: $white;
+	}
+
+	.cat-3 .tile__description &,
+	.cat-3 .tile__link-item & {
+		background: $cat-3-color;
+		box-shadow: ($text-padding * -1) 0 0 $cat-3-color, $text-padding 0 0 $cat-3-color;
+		color: $white;
+	}
+}
+
+.tile__title {
+
+	text-transform: uppercase;
+	max-width: 50%;
+	padding: 0 $text-padding;
+	margin: 10px 0 20px;
+
+	$font-size: 20;
+	$leading: 3; 
+
+	font-size: #{ $font-size }px;
+	line-height: ($font-size + ($leading * 2)) / $font-size;
+
+	.tile__text-holder {
+		padding: #{ $leading }px 0;
+	}
+}
+
+.tile__date {
+	max-width: 50%;
+	text-transform: uppercase;
+	padding: 0 $text-padding;
+	margin-bottom: 20px;
+
+	$font-size: 20;
+	$leading: 3; 
+
+	font-size: #{ $font-size }px;
+	line-height: ($font-size + ($leading * 2)) / $font-size;
+
+	.tile__text-holder {
+		padding: #{ $leading }px 0;
+	}
+}
+
+.tile__description {
+	max-width: 50%;
+	padding: 0 $text-padding;
+	margin-bottom: 20px;
+
+	$font-size: 18;
+	$leading: 3; 
+
+	font-size: #{ $font-size }px;
+	line-height: ($font-size + ($leading * 2)) / $font-size;
+
+	.tile__text-holder {
+		padding: #{ $leading }px 0;
+	}
+}
+
+.tile__links {
+	max-width: 50%;
+	list-style: none;
+}
+
+.tile__link-item {
+	display: inline-block;
+	padding: 0 $text-padding;
+
+	$font-size: 18;
+	$leading: 3; 
+
+	font-size: #{ $font-size }px;
+	line-height: ($font-size + ($leading * 2)) / $font-size;
+
+	.tile__text-holder {
+		padding: #{ $leading }px 0;
+	}
+}
+
+.tile__link {
+	text-decoration: none;
+	text-transform: uppercase;
+}
+
+.tile__location {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	max-width: 50%;
+	width: 120px;
+	height: 120px;
+	border-radius: 50%;
+
+	.cat-1 & { background: $cat-1-color; }
+	.cat-2 & { background: $cat-2-color; }
+	.cat-3 & { background: $cat-3-color; }
+
+
+}
+
+.tile__location-text {
+	text-transform: uppercase;
+	padding: 0 $text-padding;
+	position: absolute;
+	top: 10%;
+	right: 65%;
+
+	$font-size: 18;
+	$leading: 3; 
+
+	font-size: #{ $font-size }px;
+	line-height: ($font-size + ($leading * 2)) / $font-size;
+
+	.tile__text-holder {
+		padding: #{ $leading }px 0;
+	}
+}

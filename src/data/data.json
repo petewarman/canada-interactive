@@ -1,0 +1,116 @@
+{
+	"headerTitle": "The Best of Canada",
+	"headerDescription": "Lorem ipsum dolor sit amet",
+	"categories": [
+		{
+			"id": 1,
+			"text": "best to see"
+		},
+		{
+			"id": 2,
+			"text": "best to Eat"
+		},
+		{
+			"id": 3,
+			"text": "best to Do"
+		}
+	],
+	"tiles": [
+		{
+			"categoryId": 1,
+			"imgUrl": "http://lorempixel.com/300/300/nightlife/1",
+			"imgAlt": "Image alt text",
+			"name": "Event Name",
+			"date": "Event Date",
+			"description": "Description lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+			"links": [
+				{
+					"text": "Link 1",
+					"url": "#1"
+				},
+				{
+					"text": "Link 2",
+					"url": "#2"
+				}
+			],
+			"location": "Location"
+		},
+		{
+			"categoryId": 2,
+			"isBig": true,
+			"imgUrl": "http://lorempixel.com/300/300/nightlife/2",
+			"imgAlt": "Image alt text",
+			"name": "Event Name",
+			"date": "Event Date",
+			"description": "Description lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+			"links": [
+				{
+					"text": "Link 1",
+					"url": "#1"
+				},
+				{
+					"text": "Link 2",
+					"url": "#2"
+				}
+			],
+			"location": "Location"
+		},
+		{
+			"categoryId": 3,
+			"imgUrl": "http://lorempixel.com/300/300/nightlife/3",
+			"imgAlt": "Image alt text",
+			"name": "Event Name",
+			"date": "Event Date",
+			"description": "Description lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+			"links": [
+				{
+					"text": "Link 1",
+					"url": "#1"
+				},
+				{
+					"text": "Link 2",
+					"url": "#2"
+				}
+			],
+			"location": "Location"
+		},
+		{
+			"categoryId": 1,
+			"imgUrl": "http://lorempixel.com/300/300/nightlife/4",
+			"imgAlt": "Image alt text",
+			"name": "Event Name",
+			"date": "Event Date",
+			"description": "Description lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+			"links": [
+				{
+					"text": "Link 1",
+					"url": "#1"
+				},
+				{
+					"text": "Link 2",
+					"url": "#2"
+				}
+			],
+			"location": "Location"
+		},
+		{
+			"categoryId": 2,
+			"imgUrl": "http://lorempixel.com/300/300/nightlife/5",
+			"imgAlt": "Image alt text",
+			"name": "Event Name",
+			"date": "Event Date",
+			"description": "Description lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+			"links": [
+				{
+					"text": "Link 1",
+					"url": "#1"
+				},
+				{
+					"text": "Link 2",
+					"url": "#2"
+				}
+			],
+			"location": "Location"
+		}
+	]
+}

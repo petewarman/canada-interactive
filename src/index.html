@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+</head>
+<body>
+
+<!-- Use the same figure elm as NGW -->
+<figure class="element-interactive interactive">
+
+</figure>
+
+<!-- Get require.js -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.20/require.min.js"></script>
+<script>window.require || document.write( '<script src="assets/js/require.js"><\/script>' );</script>
+<!--<script src="{{assets}}/js/require.js"></script>-->
+
+<!-- Simulate boot.js -->
+<script>
+
+    // Paths
+    var guardianRoot = window.guardianRoot || "{{remote-root}}";
+    var localRoot = window.localRoot || "{{local-root}}";
+
+    // DOM element
+    var el = document.querySelector( '.interactive' );
+
+    // Boot
+    require( ['boot.js'], function ( app ) {
+        app.boot( el );
+    } );
+
+</script>
+</body>
+</html>
