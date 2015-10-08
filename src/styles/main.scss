@@ -5,6 +5,8 @@
 
 $gutter: 10px;
 $text-padding: 8px;
+$header-padding--horizontal: 20px;
+$header-padding--vertical: 20px;
 
 // colors
 $canada-red: #B12009;
@@ -16,6 +18,7 @@ $cat-3-color: #FFB31A; //ec3;
 body, html {
 	margin: 0;
 	padding: 0;
+	font-family: sans-serif;
 }
 
 .gallery-container {
@@ -38,19 +41,19 @@ body, html {
 
 .header__title {
 	border-bottom: 1px solid $white;
-	padding: 10px;
-	font-size: 24px;
+	padding: $header-padding--vertical $header-padding--horizontal;
+	font-size: 40px;
 }
 
 .header__description {
-	padding: 10px;
+	padding: $header-padding--vertical $header-padding--horizontal;
 	font-size: 18px;
 	line-height: 1.25;
 }
 
 .header__category-list {
 	list-style: none;
-	padding: 10px 5px;
+	padding: 0 $header-padding--horizontal/2 $header-padding--vertical $header-padding--horizontal/2;
 
 	&:after {
 		clear: both;
@@ -59,11 +62,11 @@ body, html {
 	}
 
 	.is-portrait & {
-		padding: 10px 5px;
+		padding: 0 $header-padding--horizontal/2 $header-padding--vertical $header-padding--horizontal/2;
 	}
 
 	.is-landscape & {
-		padding: 10px 0;
+		padding: $header-padding--vertical 0;
 	}
 }
 
@@ -74,12 +77,12 @@ body, html {
 		text-align: center;
 		float:left;
 		width: 33.33%;
-		padding: 0 5px;
+		padding: 0 $header-padding--horizontal/2;
 	}
 
 	.is-landscape & {
 		text-align: left;
-		margin: 20px 0;
+		margin: $header-padding--vertical 0;
 	}
 }
 
@@ -112,13 +115,14 @@ body, html {
 	}
 
 	.text {
-		font-size: 16px;
+		font-size: 13px;
 		display: inline-block;
 		border: 1px solid $white;
 		padding: 4px 8px;
 		line-height: 1;
 		text-transform: uppercase;
 		transition: all 0.3s;
+		letter-spacing: -0.01em;
 	}
 
 	&:hover {
@@ -306,9 +310,10 @@ body, html {
 	max-width: 50%;
 	padding: 0 $text-padding;
 	margin: 10px 0 20px;
+	font-weight: bold;
 
-	$font-size: 20;
-	$leading: 3; 
+	$font-size: 14;
+	$leading: 2; 
 
 	font-size: #{ $font-size }px;
 	line-height: ($font-size + ($leading * 2)) / $font-size;
@@ -324,8 +329,8 @@ body, html {
 	padding: 0 $text-padding;
 	margin-bottom: 20px;
 
-	$font-size: 20;
-	$leading: 3; 
+	$font-size: 12;
+	$leading: 2; 
 
 	font-size: #{ $font-size }px;
 	line-height: ($font-size + ($leading * 2)) / $font-size;
@@ -339,8 +344,9 @@ body, html {
 	max-width: 50%;
 	padding: 0 $text-padding;
 	margin-bottom: 20px;
+	font-weight: bold;
 
-	$font-size: 18;
+	$font-size: 12;
 	$leading: 3; 
 
 	font-size: #{ $font-size }px;
@@ -359,8 +365,9 @@ body, html {
 .tile__link-item {
 	display: inline-block;
 	padding: 0 $text-padding;
+	font-style: italic;
 
-	$font-size: 18;
+	$font-size: 12;
 	$leading: 3; 
 
 	font-size: #{ $font-size }px;
@@ -399,8 +406,8 @@ body, html {
 	top: 10%;
 	right: 65%;
 
-	$font-size: 18;
-	$leading: 3; 
+	$font-size: 11;
+	$leading: 2; 
 
 	font-size: #{ $font-size }px;
 	line-height: ($font-size + ($leading * 2)) / $font-size;
