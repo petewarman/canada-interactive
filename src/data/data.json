@@ -1,6 +1,6 @@
 {
-	"headerTitle": "The Best of Canada",
-	"headerDescription": "Lorem ipsum dolor sit amet",
+	"headerTitle": "The Best<br /> of Canada",
+	"headerDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.<br /><br />Select categories",
 	"categories": [
 		{
 			"id": 1,
