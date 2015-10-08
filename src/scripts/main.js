@@ -30,7 +30,7 @@ define([
 			"catButtonSelector": ".header__category-button",
 			"tilesPerAxisBreakPoint": 500,
 			"gutter": 10,
-			"landscapeMaxHeight": 600
+			"landscapeMaxHeight": 700
 		});
 	};
 
