@@ -172,7 +172,7 @@ define([
 		"setOrientation": function(orientation) {
 			this.orientation = orientation || this.determineOrientation();
 
-			this.$gallery
+			this.$interactiveContainer
 				.removeClass('is-portrait is-landscape')
 				.addClass('is-' + this.orientation);
 		},

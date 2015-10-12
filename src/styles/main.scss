@@ -67,3 +67,10 @@ body, html {
 .gallery__prev {
 	left: 0;
 }
+
+.is-portrait {
+	.gallery__next,
+	.gallery__prev {
+		display: none;
+	}
+}
