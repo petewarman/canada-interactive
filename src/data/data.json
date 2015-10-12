@@ -21,7 +21,7 @@
 	"tiles": [
 		{
 			"categoryId": 1,
-			"imgUrl": "http://lorempixel.com/300/300/nightlife/1",
+			"imgUrl": "images/LOWRES_Interactive_BC_4639.jpg",
 			"imgAlt": "Image alt text",
 			"name": "Event Name",
 			"date": "Event Date",
@@ -36,50 +36,14 @@
 					"url": "#2"
 				}
 			],
-			"location": "Location"
-		},
-		{
-			"categoryId": 2,
-			"isBig": true,
-			"imgUrl": "http://lorempixel.com/300/300/nightlife/2",
-			"imgAlt": "Image alt text",
-			"name": "Event Name",
-			"date": "Event Date",
-			"description": "Description lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
-			"links": [
-				{
-					"text": "Link 1",
-					"url": "#1"
-				},
-				{
-					"text": "Link 2",
-					"url": "#2"
-				}
-			],
-			"location": "Location"
-		},
-		{
-			"categoryId": 3,
-			"imgUrl": "http://lorempixel.com/300/300/nightlife/3",
-			"imgAlt": "Image alt text",
-			"name": "Event Name",
-			"date": "Event Date",
-			"description": "Description lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
-			"links": [
-				{
-					"text": "Link 1",
-					"url": "#1"
-				},
-				{
-					"text": "Link 2",
-					"url": "#2"
-				}
-			],
-			"location": "Location"
+			"location": "Location",
+			"location-marker-x": 70,
+			"location-marker-y": 70
 		},
 		{
 			"categoryId": 1,
-			"imgUrl": "http://lorempixel.com/300/300/nightlife/4",
+			"isBig": true,
+			"imgUrl": "images/LOWRES_Interactive_BC_5636.jpg",
 			"imgAlt": "Image alt text",
 			"name": "Event Name",
 			"date": "Event Date",
@@ -94,11 +58,55 @@
 					"url": "#2"
 				}
 			],
-			"location": "Location"
+			"location": "Location",
+			"location-marker-x": 78,
+			"location-marker-y": 75
+		},
+		{
+			"categoryId": 1,
+			"imgUrl": "images/LOWRES_Interactive_BC_5778.jpg",
+			"imgAlt": "Image alt text",
+			"name": "Event Name",
+			"date": "Event Date",
+			"description": "Description lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+			"links": [
+				{
+					"text": "Link 1",
+					"url": "#1"
+				},
+				{
+					"text": "Link 2",
+					"url": "#2"
+				}
+			],
+			"location": "Location",
+			"location-marker-x": 25,
+			"location-marker-y": 70
+		},
+		{
+			"categoryId": 3,
+			"imgUrl": "images/LOWRES_Interactive_BC_6553.jpg",
+			"imgAlt": "Image alt text",
+			"name": "Event Name",
+			"date": "Event Date",
+			"description": "Description lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+			"links": [
+				{
+					"text": "Link 1",
+					"url": "#1"
+				},
+				{
+					"text": "Link 2",
+					"url": "#2"
+				}
+			],
+			"location": "Location",
+			"location-marker-x": 30,
+			"location-marker-y": 66
 		},
 		{
 			"categoryId": 2,
-			"imgUrl": "http://lorempixel.com/300/300/nightlife/5",
+			"imgUrl": "images/LOWRES_Interactive_BC_8411.jpg",
 			"imgAlt": "Image alt text",
 			"name": "Event Name",
 			"date": "Event Date",
@@ -113,7 +121,114 @@
 					"url": "#2"
 				}
 			],
-			"location": "Location"
+			"location": "Location",
+			"location-marker-x": 78,
+			"location-marker-y": 75
+		},
+		{
+			"categoryId": 2,
+			"imgUrl": "images/LOWRES_Interactive_BC_8558.jpg",
+			"imgAlt": "Image alt text",
+			"name": "Event Name",
+			"date": "Event Date",
+			"description": "Description lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+			"links": [
+				{
+					"text": "Link 1",
+					"url": "#1"
+				},
+				{
+					"text": "Link 2",
+					"url": "#2"
+				}
+			],
+			"location": "Location",
+			"location-marker-x": 60,
+			"location-marker-y": 50
+		},
+		{
+			"categoryId": 1,
+			"imgUrl": "images/LOWRES_Interactive_Newfoundland_0048.jpg",
+			"imgAlt": "Image alt text",
+			"name": "Event Name",
+			"date": "Event Date",
+			"description": "Description lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+			"links": [
+				{
+					"text": "Link 1",
+					"url": "#1"
+				},
+				{
+					"text": "Link 2",
+					"url": "#2"
+				}
+			],
+			"location": "Location",
+			"location-marker-x": 70,
+			"location-marker-y": 70
+		},
+		{
+			"categoryId": 1,
+			"imgUrl": "images/LOWRES_Interactive_Newfoundland_0111.jpg",
+			"imgAlt": "Image alt text",
+			"name": "Event Name",
+			"date": "Event Date",
+			"description": "Description lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+			"links": [
+				{
+					"text": "Link 1",
+					"url": "#1"
+				},
+				{
+					"text": "Link 2",
+					"url": "#2"
+				}
+			],
+			"location": "Location",
+			"location-marker-x": 78,
+			"location-marker-y": 75
+		},
+		{
+			"categoryId": 2,
+			"imgUrl": "images/LOWRES_Interactive_Newfoundland_0382.jpg",
+			"imgAlt": "Image alt text",
+			"name": "Event Name",
+			"date": "Event Date",
+			"description": "Description lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+			"links": [
+				{
+					"text": "Link 1",
+					"url": "#1"
+				},
+				{
+					"text": "Link 2",
+					"url": "#2"
+				}
+			],
+			"location": "Location",
+			"location-marker-x": 25,
+			"location-marker-y": 70
+		},
+		{
+			"categoryId": 3,
+			"imgUrl": "images/LOWRES_Interactive_Newfoundland_1915.jpg",
+			"imgAlt": "Image alt text",
+			"name": "Event Name",
+			"date": "Event Date",
+			"description": "Description lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+			"links": [
+				{
+					"text": "Link 1",
+					"url": "#1"
+				},
+				{
+					"text": "Link 2",
+					"url": "#2"
+				}
+			],
+			"location": "Location",
+			"location-marker-x": 30,
+			"location-marker-y": 66
 		}
 	]
 }
