@@ -9,6 +9,8 @@
 
 .tile {
 	position: relative;
+	transform: translateZ(0);
+	-webkit-backface-visibility: hidden;
 	transition: opacity 0.5s;
 
 	&.is-inactive {
@@ -30,6 +32,8 @@
 
 	.layout-complete & {
 		transition: width 0.4s linear, height 0.4s linear;
+		transform: translateZ(0);
+		-webkit-backface-visibility: hidden;
 	}
 
 	img {
@@ -91,17 +95,20 @@
 	position: absolute;
 	left: 0;
 	top: 0;
-	right: 0;
-	bottom: 0;
 	padding: 10px;
-	overflow: auto;
+	width: calc(300% + 20px);
+	height: calc(300% + 20px);
+	overflow: hidden;
 	visibility: hidden;
 	opacity: 0;
-	transition: visibility 0s 0.2s, opacity 0.2s 0s;
+	transition: visibility 0s 0s, opacity 0s 0s;
+	box-sizing: border-box;
 
 	.is-selected & {
 		visibility: visible;
 		opacity: 1;
+		width: 100%;
+		height: 100%;
 		transition: visibility 0s 0.4s, opacity 0.3s 0.4s;
 	}
 }
