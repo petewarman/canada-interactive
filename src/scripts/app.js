@@ -52,6 +52,7 @@ define([
 
 		"getElementRefs": function() {
 			this.$tiles = $(this.options.tileSelector);
+			this.$interactiveContainer = $(this.options.interactiveContainerSelector);
 			this.$gallery = $(this.options.gallerySelector);
 			this.$container = $(this.options.containerSelector);
 			this.$header = $(this.options.headerSelector);

@@ -26,6 +26,7 @@ define([
 			"tileSelector": ".tile",
 			"gallerySelector": '.gallery',
 			"containerSelector": ".gallery-container",
+			"interactiveContainerSelector": ".interactive-container",
 			"headerSelector": ".header",
 			"catButtonSelector": ".header__category-button",
 			"tilesPerAxisBreakPoint": 500,

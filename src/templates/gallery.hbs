@@ -1,42 +1,47 @@
-<div class="gallery-container">
-	<div class="gallery">
-		<header class="header">
-			<h1 class="header__title">{{{ headerTitle }}}</h1>
-			<p class="header__description">{{{ headerDescription }}}</p>
-			<ul class="header__category-list">
-			{{#each categories}}
-				<li class="header__category-item">
-					<button data-tile-class="cat-{{ this.id }}" type="button" class="header__category-button header__category-button--{{ this.id }}">
-						<span class="icon">
-							<img src="icons/{{ this.icon }}.svg" />
-						</span>
-						<span class="text">{{ this.text }}</span>
-					</button>
-				</li>
-			{{/each}}
-			</ul>
-		</header>
+<div class="interactive-container" tabindex="0">
+	<div class="gallery-container">
+		<div class="gallery">
+			<header class="header">
+				<h1 class="header__title">{{{ headerTitle }}}</h1>
+				<p class="header__description">{{{ headerDescription }}}</p>
+				<ul class="header__category-list">
+				{{#each categories}}
+					<li class="header__category-item">
+						<button data-tile-class="cat-{{ this.id }}" type="button" class="header__category-button header__category-button--{{ this.id }}">
+							<span class="icon">
+								<img src="icons/{{ this.icon }}.svg" />
+							</span>
+							<span class="text">{{ this.text }}</span>
+						</button>
+					</li>
+				{{/each}}
+				</ul>
+			</header>
 
-		{{#each tiles}}
-			<div class="tile cat-{{ this.categoryId }} {{#if this.isBig}}tile--big{{/if}}" data-data="{{this}}">
-				<span class="tile__img-holder"><img src="{{ this.imgUrl }}" alt="{{ this.imgAlt }}" /></span>
-				<div class="tile__details">
-					<h2 class="tile__title"><span class="tile__text-holder">{{ this.name }}</span></h2>
-					<p class="tile__date"><span class="tile__text-holder">{{ this.date }}</span></p>
-					<p class="tile__description"><span class="tile__text-holder">{{ this.description }}</span></p>
-					<ul class="tile__links">
-						{{#each this.links}}
-						<li class="tile__link-item"><a class="tile__link tile__text-holder" href="{{ this.url }}">{{ this.text }}</a></li>
-						{{/each}}
-					</ul>
-					<div class="tile__location">
-						<p class="tile__location-text"><span class="tile__text-holder">{{ this.location }}</span></p>
+			{{#each tiles}}
+				<div class="tile cat-{{ this.categoryId }} {{#if this.isBig}}tile--big{{/if}}" data-data="{{this}}">
+					<span class="tile__img-holder"><img src="{{ this.imgUrl }}" alt="{{ this.imgAlt }}" /></span>
+					<div class="tile__details">
+						<h2 class="tile__title"><span class="tile__text-holder">{{ this.name }}</span></h2>
+						<p class="tile__date"><span class="tile__text-holder">{{ this.date }}</span></p>
+						<p class="tile__description"><span class="tile__text-holder">{{ this.description }}</span></p>
+						<ul class="tile__links">
+							{{#each this.links}}
+							<li class="tile__link-item"><a class="tile__link tile__text-holder" href="{{ this.url }}">{{ this.text }}</a></li>
+							{{/each}}
+						</ul>
+						<div class="tile__location">
+							<img class="tile__location-map" src="icons/map.svg" />
+							<span class="tile__location-marker" style="left:{{ this.location-marker-x }}%; top:{{ this.location-marker-y }}%;"></span>
+							<p class="tile__location-text"><span class="tile__text-holder">{{ this.location }}</span></p>
+						</div>
 					</div>
+					<span class="tile__expander"></span>
 				</div>
-			</div>
-		{{/each}}
+			{{/each}}
 
+		</div>
 	</div>
+	<button type="button" class="gallery__next"><img src="icons/arrow-right.svg" alt="Next" /></button>
+	<button type="button" class="gallery__prev is-inactive"><img src="icons/arrow-left.svg" alt="Previous" /></button>
 </div>
-
-
