@@ -133,6 +133,9 @@ define([
 			this.$gallery.packery('on', 'layoutComplete', this.onLayoutComplete);
 			this.$gallery.packery('on', 'fitComplete', this.onFitComplete);
 			this.$gallery.packery();
+			this.$gallery.on('click', this.options.tileSelector, this.onClick);
+		},
+
 		"onFitComplete": function() {
 			this.scrollToTile(this.$tiles.filter('.is-selected'));
 		},
@@ -175,7 +178,6 @@ define([
 		},
 
 		"onOrientationChange": function() {
-			console.log('orientation change:', this.orientation);
 			this.destroyPackery();
 			this.initializePackery();
 		},
@@ -275,10 +277,11 @@ define([
 			this.setTileWidth($tile, this.selectedTileSize);
 
 			if (this.orientation === 'landscape') {
-				this.$gallery.packery('fit', $tile[0], undefined, 0);
+				this.$gallery.packery('fit', $tile[0], $tile.position().left, 0);
 			} else {
 				this.$gallery.packery('fit', $tile[0], 0);
 			}
+			//this.$gallery.packery('sortItems');
 			this.$gallery.packery();
 		},
 

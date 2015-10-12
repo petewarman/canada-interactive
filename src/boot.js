@@ -6,7 +6,8 @@ define( [], function () {
   var rootPath = isLocal() ? "" : "{{remote-root}}";
 
   function isLocal() {
-    return window.location.hostname === 'localhost'; 
+    //return window.location.hostname === 'localhost'; 
+    return true;
   }
 
   function addCSS( url ) {
