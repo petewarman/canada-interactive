@@ -47,7 +47,10 @@ define([
 		"addEventListeners": function (){
 			$(window).on('resize', _.debounce(this.onResize, 300));
 			this.$catButtons.on('click', this.onCategoryButtonClick);
-			this.$gallery.on('click', this.options.tileSelector, this.onClick);
+			this.$scrollRightButton.on('click', this.scrollRight);
+			this.$scrollLeftButton.on('click', this.scrollLeft);
+			$(document).on('keydown', this.options.interactiveContainerSelector, this.onKeyUp);
+			this.$container.on('scroll', _.debounce(this.onScroll, 200));
 		},
 
 		"getElementRefs": function() {
@@ -57,6 +60,50 @@ define([
 			this.$container = $(this.options.containerSelector);
 			this.$header = $(this.options.headerSelector);
 			this.$catButtons = $(this.options.catButtonSelector);
+			this.$scrollRightButton = $(this.options.scrollRightButtonSelector);
+			this.$scrollLeftButton = $(this.options.scrollLeftButtonSelector);
+		},
+
+		"onScroll": function() {
+			if (this.orientation === 'portrait') { return; }
+
+			var scrollLeft = this.$container.scrollLeft();
+
+			if(scrollLeft <= 0) {
+				this.$interactiveContainer.focus();
+				this.$scrollLeftButton.addClass('is-inactive');
+			} else {
+				this.$scrollLeftButton.removeClass('is-inactive');
+			}
+
+			if(scrollLeft >= this.rightScrollBounds) {
+				this.$interactiveContainer.focus();
+				this.$scrollRightButton.addClass('is-inactive');
+			} else {
+				this.$scrollRightButton.removeClass('is-inactive');
+			}
+		},
+
+		"onKeyUp": function(e) {
+			if (e.which === 39) {
+				this.scrollRight();
+			}
+
+			if (e.which === 37) {
+				this.scrollLeft();
+			}
+		},
+
+		"scrollRight": function() {
+			if (this.orientation === 'portrait') { return; }
+
+			this.$container.stop(true, false).animate({'scrollLeft': '+=' + (this.containerWidth * 2/3) + 'px'});
+		},
+
+		"scrollLeft": function() {
+			if (this.orientation === 'portrait') { return; }
+
+			this.$container.stop(true, false).animate({'scrollLeft': '-=' + (this.containerWidth * 2/3) + 'px'});
 		},
 
 		"determineOrientation": function() {
@@ -84,11 +131,21 @@ define([
 		"initializePackery": function() {
 			this.$gallery.packery(this.getPackeryOptions());
 			this.$gallery.packery('on', 'layoutComplete', this.onLayoutComplete);
+			this.$gallery.packery('on', 'fitComplete', this.onFitComplete);
 			this.$gallery.packery();
+		"onFitComplete": function() {
+			this.scrollToTile(this.$tiles.filter('.is-selected'));
 		},
 
 		"onLayoutComplete": function() {
 			this.$gallery.addClass('layout-complete');
+			_.defer(this.setRightScrollBounds);
+		},
+
+		"scrollToTile": function($tile) {
+			if (this.orientation === 'landscape' && $tile.length > 0) {
+				this.$container.stop(true, false).animate({'scrollLeft': $tile.position().left - ((this.$container.width() - $tile.width()) / 2)})
+			}
 		},
 
 		"destroyPackery": function() {
@@ -154,6 +211,11 @@ define([
 			this.setTileWidth(this.$tiles.filter('.is-selected'), this.selectedTileSize);
 			this.setTileWidth(this.$tiles.not('.is-selected').not('.tile--big'), this.tileSize);
 			this.setTileWidth(this.$tiles.not('.is-selected').filter('.tile--big'), this.bigTileSize);
+		},
+
+		"setRightScrollBounds": function() {
+			this.rightScrollBounds = this.$gallery.outerWidth() - this.$container.width();
+			this.onScroll();
 		},
 
 		"setHeaderDims": function() {
@@ -243,7 +305,7 @@ define([
 
 	};
 
-	_.bindAll(app, 'init', 'onClick', 'onResize', 'onLayoutComplete', 'onCategoryButtonClick');
+	_.bindAll(app, 'init', 'onClick', 'onResize', 'onLayoutComplete', 'onCategoryButtonClick', 'scrollRight', 'scrollLeft', 'onKeyUp', 'onScroll', 'setRightScrollBounds', 'onFitComplete');
 
 	return app;
 

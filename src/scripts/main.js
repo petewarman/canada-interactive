@@ -29,6 +29,8 @@ define([
 			"interactiveContainerSelector": ".interactive-container",
 			"headerSelector": ".header",
 			"catButtonSelector": ".header__category-button",
+			"scrollRightButtonSelector": ".gallery__next",
+			"scrollLeftButtonSelector": ".gallery__prev",
 			"tilesPerAxisBreakPoint": 500,
 			"gutter": 10,
 			"landscapeMaxHeight": 700
