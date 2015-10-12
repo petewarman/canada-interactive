@@ -50,6 +50,36 @@
 		filter: none;
 	}
 
+	.is-row-1 & {
+		top: 0;
+	}
+
+	.tiles-per-axis-2 .is-row-2 &,
+	.is-row-3 & {
+		top: auto;
+		bottom: 0;
+	}
+
+	.tiles-per-axis-3 .is-row-2 & {
+		top: 50%;
+		transform: translateY(-50%);
+	}
+
+	.is-col-1 & {
+		left: 0;
+	}
+
+	.tiles-per-axis-2 .is-col-2 &,
+	.is-col-3 & {
+		left: auto;
+		right: 0;
+	}
+
+	.tiles-per-axis-3 .is-col-2 & {
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
 	.cat-1 & { background: $cat-1-color; }
 	.cat-2 & { background: $cat-2-color; }
 	.cat-3 & { background: $cat-3-color; }

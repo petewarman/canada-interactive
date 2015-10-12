@@ -183,9 +183,6 @@ define([
 		},
 
 		"setDimensions": function() {
-			var tilesPerAxis, //number of tiles per column or row
-				bigTileRatio; //ratio of big tiles to small tiles
-
 			if (this.orientation === 'landscape') {
 				this.gallerySize = parseInt(this.winHeight - (this.options.gutter * 2), 10);
 
@@ -197,11 +194,13 @@ define([
 				this.gallerySize = parseInt(this.$gallery.width(), 10);
 			}
 
-			tilesPerAxis = (this.gallerySize > this.options.tilesPerAxisBreakPoint) ? 3 : 2;
-			bigTileRatio = (this.gallerySize > this.options.tilesPerAxisBreakPoint) ? 2 : 1;
+			this.tilesPerAxis = (this.gallerySize > this.options.tilesPerAxisBreakPoint) ? 3 : 2; //number of tiles per column or row
+			this.bigTileRatio = (this.gallerySize > this.options.tilesPerAxisBreakPoint) ? 2 : 1; //ratio of big tiles to small tiles
 
-			this.tileSize = this.getTileSize(this.gallerySize, tilesPerAxis, this.options.gutter);
-			this.bigTileSize = (this.tileSize * bigTileRatio) + (this.options.gutter * (bigTileRatio - 1));
+			this.$container.removeClass('tiles-per-axis-2 tiles-per-axis-3').addClass('tiles-per-axis-' + this.tilesPerAxis);
+
+			this.tileSize = this.getTileSize(this.gallerySize, this.tilesPerAxis, this.options.gutter);
+			this.bigTileSize = (this.tileSize * this.bigTileRatio) + (this.options.gutter * (this.bigTileRatio - 1));
 			this.selectedTileSize = this.gallerySize;
 
 			this.setGalleryDims();
@@ -270,15 +269,33 @@ define([
 		"selectTile": function($tile) {
 			var currColumn,
 				targetOffset,
-				$tileInner = $tile.children('.tile__img-holder');
+				$tileInner = $tile.children('.tile__img-holder'),
+				tilePos = $tile.position();
 
-			$tile.addClass('is-selected');
+			$tile.addClass('is-selected').addClass('is-enlarged');
+			$tile.removeClass('is-row-1 is-row-2 is-row-3 is-col-1 is-col-2 is-col-3');
 
 			this.setTileWidth($tile, this.selectedTileSize);
 
 			if (this.orientation === 'landscape') {
-				this.$gallery.packery('fit', $tile[0], $tile.position().left, 0);
+				if(tilePos.top === 0) {
+					$tile.addClass('is-row-1');
+				} else if(tilePos.top === this.tileSize + this.options.gutter) {
+					$tile.addClass('is-row-2');
+				} else {
+					$tile.addClass('is-row-3');
+				}
+
+				this.$gallery.packery('fit', $tile[0], tilePos.left, 0);
+
 			} else {
+				if(tilePos.left === 0) {
+					$tile.addClass('is-col-1');
+				} else if(tilePos.left === this.tileSize + this.options.gutter) {
+					$tile.addClass('is-col-2');
+				} else {
+					$tile.addClass('is-col-3');
+				}
 				this.$gallery.packery('fit', $tile[0], 0);
 			}
 			//this.$gallery.packery('sortItems');
@@ -308,7 +325,7 @@ define([
 
 	};
 
-	_.bindAll(app, 'init', 'onClick', 'onResize', 'onLayoutComplete', 'onCategoryButtonClick', 'scrollRight', 'scrollLeft', 'onKeyUp', 'onScroll', 'setRightScrollBounds', 'onFitComplete');
+	_.bindAll(app, 'init', 'onClick', 'onResize', 'onLayoutComplete', 'onCategoryButtonClick', 'scrollRight', 'scrollLeft', 'onKeyUp', 'onScroll', 'setRightScrollBounds', 'onTransitionend');
 
 	return app;
 
