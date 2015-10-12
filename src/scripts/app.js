@@ -51,6 +51,7 @@ define([
 			this.$scrollLeftButton.on('click', this.scrollLeft);
 			$(document).on('keydown', this.options.interactiveContainerSelector, this.onKeyUp);
 			this.$container.on('scroll', _.debounce(this.onScroll, 200));
+			$('.tile__img-holder').on('transitionend', _.debounce(this.onTransitionend, 200));
 		},
 
 		"getElementRefs": function() {
@@ -131,13 +132,12 @@ define([
 		"initializePackery": function() {
 			this.$gallery.packery(this.getPackeryOptions());
 			this.$gallery.packery('on', 'layoutComplete', this.onLayoutComplete);
-			this.$gallery.packery('on', 'fitComplete', this.onFitComplete);
 			this.$gallery.packery();
 			this.$gallery.on('click', this.options.tileSelector, this.onClick);
 		},
 
-		"onFitComplete": function() {
-			this.scrollToTile(this.$tiles.filter('.is-selected'));
+		"onTransitionend": function (e) {
+			this.$tiles.not('.is-selected').removeClass('is-enlarged');
 		},
 
 		"onLayoutComplete": function() {
