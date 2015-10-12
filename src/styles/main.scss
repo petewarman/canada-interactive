@@ -1,33 +1,30 @@
 // bower:scss
 // endbower
 
+$guss-webfonts-base-url: '//pasteup.guim.co.uk/fonts/';
+
+/**
+  * Use pasteup for deployed app. Use local folder, for local: '/bower_components/guss-webfonts/webfonts'
+  */
+//match: /\/\/pasteup\.guim\.co\.uk\/fonts\/0\.1\.0/g,
+//replacement: '/bower_components/guss-webfonts/webfonts'
+
+@import '../vendor/pasteup-palette/src/_palette.scss';
+@import '../vendor/guss-webfonts/src/_webfonts.scss';
+@import '../vendor/guss-typography/_typography.scss';
+
+@include guss-webfonts('Guardian Agate Sans 1 Web');
+@include guss-typography-defaults;
+
 @import 'reset';
-
-$gutter: 10px;
-$text-padding: 8px;
-$header-padding--horizontal: 20px;
-$header-padding--vertical: 20px;
-
-// colors
-$canada-red: #B12009;
-$white: #fff;
-$cat-1-color: #00CE9D; //3c9;
-$cat-2-color: #F46300; //d63;
-$cat-3-color: #FFB31A; //ec3;
-
-@mixin tile-element-sizer($font-size, $leading) {
-	font-size: #{ $font-size }px;
-	line-height: ($font-size + ($leading * 2)) / $font-size;
-
-	.tile__text-holder {
-		padding: #{ $leading }px 0;
-	}
-}
+@import 'variables';
+@import 'header';
+@import 'tile';
 
 body, html {
 	margin: 0;
 	padding: 0;
-	font-family: sans-serif;
+	font-family: 'Guardian Agate Sans 1 Web', sans-serif;
 }
 
 .gallery-container {
@@ -41,368 +38,32 @@ body, html {
 	background: $white;
 }
 
-.header {
-	overflow: auto;
-	background: $canada-red;
-	color: $white;
-	box-sizing: border-box;
-}
+.gallery__next,
+.gallery__prev {
+	$duration: 0.3s;
 
-.header__title {
-	border-bottom: 1px solid $white;
-	padding: $header-padding--vertical $header-padding--horizontal;
-	font-size: 40px;
-}
-
-.header__description {
-	padding: $header-padding--vertical $header-padding--horizontal 0;
-	font-size: 18px;
-	line-height: 1.25;
-}
-
-.header__category-list {
-	list-style: none;
-	padding: 0 $header-padding--horizontal/2 $header-padding--vertical $header-padding--horizontal/2;
-
-	&:after {
-		clear: both;
-		content: '';
-		display: block;
-	}
-
-	.is-portrait & {
-		padding: 10px $header-padding--horizontal/2 $header-padding--vertical $header-padding--horizontal/2;
-	}
-
-	.is-landscape & {
-		padding: 0;
-	}
-}
-
-.header__category-item {
-	box-sizing: border-box;
-
-	.is-portrait & {
-		text-align: center;
-		float:left;
-		width: 33.33%;
-		padding: 0 $header-padding--horizontal/2;
-	}
-
-	.is-landscape & {
-		text-align: left;
-		margin: 30px 0;
-	}
-}
-
-.header__category-button {
-	border: 0;
-	background: none;
-	color: $white;
-	font-family: inherit;
-	position: relative;
 	margin: 0;
-	cursor: pointer;
-
-	.icon {
-		position: absolute;
-		width: 40px;
-		height: 40px;
-		border-radius: 50%;
-		background: $cat-1-color;
-		color: rgba(0,0,0,0.5);
-
-		img {
-			opacity: 0.5;
-			position: absolute;
-			max-width: 65%;
-			max-height: 65%;
-			left: 50%;
-			top: 50%;
-			transform: translate(-50%, -50%);
-		}
-	}
-
-	.text {
-		font-size: 13px;
-		display: inline-block;
-		border: 1px solid $white;
-		padding: 4px 8px;
-		line-height: 1;
-		text-transform: uppercase;
-		transition: all 0.3s;
-		letter-spacing: -0.01em;
-	}
-
-	&:hover {
-		.text {
-			text-decoration: underline;
-		}
-	}
-
-	&:focus {
-		outline: 0;
-
-		.text {
-			box-shadow: 0 0 5px rgba(255,255,255,0.95);
-		}
-	}
-
-	&.is-selected {
-		.text {
-			border-color: transparent;
-			background: rgba(0,0,0,0.5);
-		}
-	}
-
-	.is-portrait & {
-		padding: 50px 0 0;
-
-		.icon {
-			left: 50%;
-			top: 0;
-			margin-left: -20px;
-		}
-	}
-
-	.is-landscape & {
-		padding: 0 10px 0 60px;
-		display: block;
-		width: 100%;
-
-		.text {
-			display: block;
-			text-align: center;
-		}
-
-		.icon {
-			top: 50%;
-			left: 10px;
-			margin-top: -20px;
-		}
-
-		&.is-selected {
-			background: rgba(0,0,0,0.5);
-
-			.text {
-				border-color: transparent;
-				background: transparent;
-			}
-
-			&:focus {
-				box-shadow: 0 0 5px rgba(255,255,255,0.95);
-
-				.text {
-					box-shadow: none;
-				}
-			}
-		}
-	}
-}
-
-.header__category-button--1 {
-	.icon {
-		background: $cat-1-color;
-	}
-}
-
-.header__category-button--2 {
-	.icon {
-		background: $cat-2-color;
-	}
-}
-
-.header__category-button--3 {
-	.icon {
-		background: $cat-3-color;
-	}
-}
-
-.tile {
-	position: relative;
-	transition: opacity 0.5s;
+	padding: 10px;
+	border: 0;
+	background: $white;
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 50px;
+	height: 50px;
+	transition: opacity $duration 0s, visibility 0s 0s;
 
 	&.is-inactive {
-		opacity: 0.1;
+		opacity: 0;
+		visibility: hidden;
+		transition: opacity $duration 0s, visibility 0s $duration;
 	}
 }
 
-.tile__img-holder {
-	position: absolute;
-	display: block;
-	width: 100%;
-	left: 0;
-	top: 0;
-
-	.layout-complete & {
-		transition: width 0.4s, height 0.4s;
-	}
-
-	img {
-		display: block;
-		width: 100%;
-		position: absolute;
-		left: 0;
-		top: 0;
-		transition: opacity 0.3s;
-	}
-
-	&:hover img {
-		opacity: 0.4;
-	}
-
-	.is-selected &:hover img {
-		opacity: 1;
-	}
-
-	.cat-1 & { background: $cat-1-color; }
-	.cat-2 & { background: $cat-2-color; }
-	.cat-3 & { background: $cat-3-color; }
-
-}
-
-.tile__details {
-	position: absolute;
-	left: 0;
-	top: 0;
+.gallery__next {
 	right: 0;
-	bottom: 0;
-	padding: 10px;
-	overflow: auto;
-	visibility: hidden;
-	opacity: 0;
-	transition: visibility 0s 0.2s, opacity 0.2s 0s;
-
-	.is-selected & {
-		visibility: visible;
-		opacity: 1;
-		transition: visibility 0s 0.4s, opacity 0.3s 0.4s;
-	}
 }
 
-.tile__text-holder {
-	display: inline;
-
-	.tile__title &,
-	.tile__date &,
-	.tile__location-text & {
-		background: $canada-red;
-		color: $white;
-		box-shadow: ($text-padding * -1) 0 0 $canada-red, $text-padding 0 0 $canada-red;
-	}
-
-	.cat-1 .tile__description &,
-	.cat-1 .tile__link-item & {
-		background: $cat-1-color;
-		box-shadow: ($text-padding * -1) 0 0 $cat-1-color, $text-padding 0 0 $cat-1-color;
-		color: $white;
-	}
-
-	.cat-2 .tile__description &,
-	.cat-2 .tile__link-item & {
-		background: $cat-2-color;
-		box-shadow: ($text-padding * -1) 0 0 $cat-2-color, $text-padding 0 0 $cat-2-color;
-		color: $white;
-	}
-
-	.cat-3 .tile__description &,
-	.cat-3 .tile__link-item & {
-		background: $cat-3-color;
-		box-shadow: ($text-padding * -1) 0 0 $cat-3-color, $text-padding 0 0 $cat-3-color;
-		color: $white;
-	}
-}
-
-.tile__title {
-
-	text-transform: uppercase;
-	max-width: 50%;
-	padding: 0 $text-padding;
-	margin: 10px 0 20px;
-	font-weight: bold;
-	@include tile-element-sizer(14, 2);
-
-}
-
-.tile__date {
-	max-width: 50%;
-	text-transform: uppercase;
-	padding: 0 $text-padding;
-	margin-bottom: 20px;
-	@include tile-element-sizer(12, 2);
-}
-
-.tile__description {
-	max-width: 50%;
-	padding: 0 $text-padding;
-	margin-bottom: 20px;
-	font-weight: bold;
-	@include tile-element-sizer(12, 2);
-}
-
-.tile__links {
-	max-width: 50%;
-	list-style: none;
-}
-
-.tile__link-item {
-	display: inline-block;
-	padding: 0 $text-padding;
-	font-style: italic;
-	@include tile-element-sizer(12, 2);
-}
-
-.tile__link {
-	text-decoration: none;
-	text-transform: uppercase;
-}
-
-.tile__location {
-	position: absolute;
-	right: 10px;
-	top: 10px;
-	max-width: 50%;
-	width: 100px;
-	height: 100px;
-	border-radius: 50%;
-
-	.cat-1 & { background: $cat-1-color; }
-	.cat-2 & { background: $cat-2-color; }
-	.cat-3 & { background: $cat-3-color; }
-}
-
-.tile__location-text {
-	text-transform: uppercase;
-	padding: 0 $text-padding;
-	position: absolute;
-	top: 10%;
-	right: 65%;
-	@include tile-element-sizer(11, 2);
-}
-
-@media screen and (min-height: 450px) {
-	.is-landscape {
-		.header__title {}
-		.header__description {}
-		.header__category-button .text {}
-		.header__category-button .icon {}
-	}
-}
-
-@media screen and (min-height: 521px) and (min-width: 521px) {
-	.tile__title { @include tile-element-sizer(18, 3); }
-	.tile__date { @include tile-element-sizer(14, 2); }
-	.tile__description { @include tile-element-sizer(14, 2); }
-	.tile__link-item { @include tile-element-sizer(14, 2); }
-	.tile__location-text { @include tile-element-sizer(14, 2); }
-	.tile__location { width: 120px; height: 120px; }
-}
-
-@media screen and (min-height: 600px) and (min-width: 600px) {
-	.tile__title { @include tile-element-sizer(24, 3); }
-	.tile__date { @include tile-element-sizer(20, 2); }
-	.tile__description { @include tile-element-sizer(20, 2); }
-	.tile__link-item { @include tile-element-sizer(20, 2); }
-	.tile__location-text { @include tile-element-sizer(20, 2); }
-	.tile__location { width: 150px; height: 150px; }
+.gallery__prev {
+	left: 0;
 }

@@ -1,0 +1,240 @@
+@mixin tile-element-sizer($font-size, $leading) {
+	font-size: #{ $font-size }px;
+	line-height: ($font-size + ($leading * 2)) / $font-size;
+
+	.tile__text-holder {
+		padding: #{ $leading }px 0;
+	}
+}
+
+.tile {
+	position: relative;
+	transition: opacity 0.5s;
+
+	&.is-inactive {
+		opacity: 0.1;
+	}
+
+	&.is-selected {
+		transition: none !important;
+	}
+}
+
+.tile__img-holder {
+	position: absolute;
+	display: block;
+	width: 100%;
+	left: 0;
+	top: 0;
+
+	.layout-complete & {
+		transition: width 0.4s, height 0.4s;
+	}
+
+	img {
+		display: block;
+		width: 100%;
+		position: absolute;
+		left: 0;
+		top: 0;
+		transition: opacity 0.3s;
+	}
+
+	.tile:hover & img {
+		opacity: 0.3;
+		filter: grayscale(100%);
+	}
+
+	.is-selected:hover & img {
+		opacity: 1;
+		filter: none;
+	}
+
+	.cat-1 & { background: $cat-1-color; }
+	.cat-2 & { background: $cat-2-color; }
+	.cat-3 & { background: $cat-3-color; }
+
+}
+
+.tile__details {
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	padding: 10px;
+	overflow: auto;
+	visibility: hidden;
+	opacity: 0;
+	transition: visibility 0s 0.2s, opacity 0.2s 0s;
+
+	.is-selected & {
+		visibility: visible;
+		opacity: 1;
+		transition: visibility 0s 0.4s, opacity 0.3s 0.4s;
+	}
+}
+
+.tile__text-holder {
+	display: inline;
+
+	.tile__title &,
+	.tile__date &,
+	.tile__location-text & {
+		background: $canada-red;
+		color: $white;
+		box-shadow: ($text-padding * -1) 0 0 $canada-red, $text-padding 0 0 $canada-red;
+	}
+
+	.cat-1 .tile__description &,
+	.cat-1 .tile__link-item & {
+		background: $cat-1-color;
+		box-shadow: ($text-padding * -1) 0 0 $cat-1-color, $text-padding 0 0 $cat-1-color;
+		color: $white;
+	}
+
+	.cat-2 .tile__description &,
+	.cat-2 .tile__link-item & {
+		background: $cat-2-color;
+		box-shadow: ($text-padding * -1) 0 0 $cat-2-color, $text-padding 0 0 $cat-2-color;
+		color: $white;
+	}
+
+	.cat-3 .tile__description &,
+	.cat-3 .tile__link-item & {
+		background: $cat-3-color;
+		box-shadow: ($text-padding * -1) 0 0 $cat-3-color, $text-padding 0 0 $cat-3-color;
+		color: $white;
+	}
+}
+
+.tile__title {
+
+	text-transform: uppercase;
+	max-width: 50%;
+	padding: 0 $text-padding;
+	margin: 10px 0 20px;
+	font-weight: bold;
+	@include tile-element-sizer(14, 2);
+
+}
+
+.tile__date {
+	max-width: 50%;
+	text-transform: uppercase;
+	padding: 0 $text-padding;
+	margin-bottom: 20px;
+	@include tile-element-sizer(12, 2);
+}
+
+.tile__description {
+	max-width: 50%;
+	padding: 0 $text-padding;
+	margin-bottom: 20px;
+	font-weight: bold;
+	@include tile-element-sizer(12, 2);
+}
+
+.tile__links {
+	max-width: 50%;
+	list-style: none;
+}
+
+.tile__link-item {
+	display: inline-block;
+	padding: 0 $text-padding;
+	font-style: italic;
+	@include tile-element-sizer(12, 2);
+}
+
+.tile__link {
+	text-decoration: none;
+	text-transform: uppercase;
+}
+
+.tile__location {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	max-width: 50%;
+	width: 100px;
+	height: 100px;
+	border-radius: 50%;
+
+	.cat-1 & { background: $cat-1-color; }
+	.cat-2 & { background: $cat-2-color; }
+	.cat-3 & { background: $cat-3-color; }
+}
+
+.tile__location-text {
+	text-transform: uppercase;
+	padding: 0 $text-padding;
+	position: absolute;
+	top: 10%;
+	right: 65%;
+	@include tile-element-sizer(11, 2);
+}
+
+.tile__location-map {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%,-50%);
+	max-width: 75%;
+	max-height: 75%;
+	opacity: 0.5;
+}
+
+.tile__location-marker {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%,-50%);
+	width: 8%;
+	height: 8%;
+	border-radius: 50%;
+	background: $canada-red;
+}
+
+.tile__expander {
+	position: absolute;
+	right: 10px;
+	bottom: 10px;
+	background: url(../icons/expand.svg) center center no-repeat;
+	background-size: contain;
+	width: 20px;
+	height: 20px;
+	opacity: 0;
+	transition: all 0.4s;
+	transform: scale(0.5);
+	cursor: pointer;
+
+	.tile:hover & {
+		opacity: 1;
+		transform: none;
+		transition-delay: 0.2s
+	}
+
+	.is-selected:hover & {
+		opacity: 0;
+		transform: scale(0.5);
+	}
+}
+
+@media screen and (min-height: 521px) and (min-width: 521px) {
+	.tile__title { @include tile-element-sizer(18, 3); }
+	.tile__date { @include tile-element-sizer(14, 2); }
+	.tile__description { @include tile-element-sizer(14, 2); }
+	.tile__link-item { @include tile-element-sizer(14, 2); }
+	.tile__location-text { @include tile-element-sizer(14, 2); }
+	.tile__location { width: 120px; height: 120px; }
+}
+
+@media screen and (min-height: 600px) and (min-width: 600px) {
+	.tile__title { @include tile-element-sizer(24, 3); }
+	.tile__date { @include tile-element-sizer(20, 2); }
+	.tile__description { @include tile-element-sizer(20, 2); }
+	.tile__link-item { @include tile-element-sizer(20, 2); }
+	.tile__location-text { @include tile-element-sizer(20, 2); }
+	.tile__location { width: 150px; height: 150px; }
+}
