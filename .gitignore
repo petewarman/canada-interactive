@@ -1,5 +1,5 @@
 .sass-cache
 node_modules
 dist
-src/scripts/vendor
+src/vendor
 src/styles/main.css

@@ -1,4 +1,4 @@
 {
-  "directory": "src/scripts/vendor/",
+  "directory": "src/vendor/",
   "analytics": false
 }
