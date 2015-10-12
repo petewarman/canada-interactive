@@ -15,8 +15,9 @@
 		opacity: 0.1;
 	}
 
-	&.is-selected {
+	&.is-enlarged {
 		transition: none !important;
+		z-index: 1;
 	}
 }
 
