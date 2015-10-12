@@ -28,7 +28,7 @@
 	top: 0;
 
 	.layout-complete & {
-		transition: width 0.4s, height 0.4s;
+		transition: width 0.4s linear, height 0.4s linear;
 	}
 
 	img {

@@ -147,7 +147,9 @@ define([
 
 		"scrollToTile": function($tile) {
 			if (this.orientation === 'landscape' && $tile.length > 0) {
-				this.$container.stop(true, false).animate({'scrollLeft': $tile.position().left - ((this.$container.width() - $tile.width()) / 2)})
+				this.$container.stop(true, false).animate({'scrollLeft': $tile.position().left - ((this.$container.width() - $tile.width()) / 2)}, 400, 'linear')
+			} else {
+				$('html, body').stop(true, false).animate({'scrollTop': $tile.offset().top - ((this.winHeight - $tile.width()) / 2)}, 400, 'linear');
 			}
 		},
 
