@@ -26,14 +26,18 @@ define([
 		this.items = sortedItems;
 	}
 
+	Packery.Item.prototype.positionPlaceRect = function( x, y, isMaxOpen ) {
+		this.placeRect.x = this.getPlaceRectCoord( x, true, isMaxOpen );
+		this.placeRect.y = this.getPlaceRectCoord( y, false, isMaxOpen );
+	};
+
 	bridget( 'packery', Packery );
 
 	var app = {
 
 		"init": function(options) {
 
-			var defaults = {
-			};
+			var defaults = {};
 
 			this.options = _.extend(defaults, options); 
 
@@ -41,6 +45,7 @@ define([
 			this.setOrientation();
 			this.setDimensions();
 			this.initializePackery();
+			this.setScrollButtonStates();
 			this.addEventListeners();
 		},
 
@@ -50,8 +55,8 @@ define([
 			this.$scrollRightButton.on('click', this.scrollRight);
 			this.$scrollLeftButton.on('click', this.scrollLeft);
 			$(document).on('keydown', this.options.interactiveContainerSelector, this.onKeyUp);
-			this.$container.on('scroll', _.debounce(this.onScroll, 200));
-			$('.tile__img-holder').on('transitionend', _.debounce(this.onTransitionend, 200));
+			$('.tile__img-holder').on('transitionend', _.debounce(this.onTileTransitionend, 200))
+			this.$gallery.on('transitionend', this.onGalleryTransitionend);
 		},
 
 		"getElementRefs": function() {
@@ -65,19 +70,31 @@ define([
 			this.$scrollLeftButton = $(this.options.scrollLeftButtonSelector);
 		},
 
-		"onScroll": function() {
-			if (this.orientation === 'portrait') { return; }
+		"getGalleryOffsetBounds": function() {
+			return {
+				"upper": 0,
+				"lower": this.$container.width() - this.$gallery.outerWidth()
+			};
+		},
 
-			var scrollLeft = this.$container.scrollLeft();
+		"constrainGalleryOffset": function(offset) {
+			var bounds = this.getGalleryOffsetBounds();
 
-			if(scrollLeft <= 0) {
+			return Math.min(bounds.upper, Math.max(bounds.lower, offset));
+		},
+
+		"setScrollButtonStates": function() {
+			var bounds = this.getGalleryOffsetBounds();
+			var offset = this.getCurrGalleryOffset();
+
+			if(offset >= bounds.upper) {
 				this.$interactiveContainer.focus();
 				this.$scrollLeftButton.addClass('is-inactive');
 			} else {
 				this.$scrollLeftButton.removeClass('is-inactive');
 			}
 
-			if(scrollLeft >= this.rightScrollBounds) {
+			if (offset <= bounds.lower) {
 				this.$interactiveContainer.focus();
 				this.$scrollRightButton.addClass('is-inactive');
 			} else {
@@ -95,16 +112,32 @@ define([
 			}
 		},
 
+		"scrollTo": function(offset) {
+			//this.$gallery.css({'left': this.constrainGalleryOffset(offset) + 'px'});
+			var newOffset = this.constrainGalleryOffset(offset);
+			this.$gallery.css({'transform': 'translateX(' + newOffset + 'px)'}).data('offset', newOffset);
+		},
+
+		"getCurrGalleryOffset": function() {
+			return this.$gallery.data('offset') || 0;
+		},
+
 		"scrollRight": function() {
 			if (this.orientation === 'portrait') { return; }
 
-			this.$container.stop(true, false).animate({'scrollLeft': '+=' + (this.containerWidth * 2/3) + 'px'});
+			var currOffset = this.getCurrGalleryOffset(),
+				decrement = this.containerWidth * 2/3;
+
+			this.scrollTo(currOffset - decrement);
 		},
 
 		"scrollLeft": function() {
 			if (this.orientation === 'portrait') { return; }
 
-			this.$container.stop(true, false).animate({'scrollLeft': '-=' + (this.containerWidth * 2/3) + 'px'});
+			var currOffset = this.getCurrGalleryOffset(),
+				increment = this.containerWidth * 2/3;
+
+			this.scrollTo(currOffset + increment);
 		},
 
 		"determineOrientation": function() {
@@ -132,22 +165,37 @@ define([
 		"initializePackery": function() {
 			this.$gallery.packery(this.getPackeryOptions());
 			this.$gallery.packery('on', 'layoutComplete', this.onLayoutComplete);
-			this.$gallery.packery();
+			//this.$gallery.packery();
 			this.$gallery.on('click', this.options.tileSelector, this.onClick);
+			this.$gallery.packery();
 		},
 
-		"onTransitionend": function (e) {
-			this.$tiles.not('.is-selected').removeClass('is-enlarged');
+		"fitIt": function() {
+			//console.log('fitIt', Packery.data(this.$gallery.get(0)));
+			//this.$gallery.packery('fit', this.$tiles.get()[0], 0);
+			//this.$gallery.packery('sortItems');
+		},
+
+		"onTileTransitionend": function (e) {
+			if($(e.target).hasClass('tile__img-holder')) {
+				this.$tiles.not('.is-selected').removeClass('is-enlarged');
+				_.defer(this.fitIt);
+			}
+		},
+
+		"onGalleryTransitionend": function(e) {
+			if(e.target === this.$gallery.get(0)) {
+				this.setScrollButtonStates();
+			}
 		},
 
 		"onLayoutComplete": function() {
 			this.$gallery.addClass('layout-complete');
-			_.defer(this.setRightScrollBounds);
 		},
 
 		"scrollToTile": function($tile) {
 			if (this.orientation === 'landscape' && $tile.length > 0) {
-				this.$container.stop(true, false).animate({'scrollLeft': $tile.position().left - ((this.$container.width() - $tile.width()) / 2)}, 400, 'linear')
+				this.scrollTo(($tile.position().left * -1) + ((this.$container.width() - $tile.width()) / 2));
 			} else {
 				$('html, body').stop(true, false).animate({'scrollTop': $tile.offset().top - ((this.winHeight - $tile.width()) / 2)}, 400, 'linear');
 			}
@@ -169,6 +217,19 @@ define([
 
 			this.setDimensions();
 			this.$gallery.packery();
+			_.defer(this.checkGalleryOffset);
+		},
+
+		"checkGalleryOffset": function() {
+			var offset = this.getCurrGalleryOffset(),
+				newOffset = this.constrainGalleryOffset(offset);
+
+			if(offset !== newOffset) {
+				this.scrollTo(newOffset);
+			} else {
+				this.setScrollButtonStates();
+			}
+
 		},
 
 		"setOrientation": function(orientation) {
@@ -216,11 +277,6 @@ define([
 			this.setTileWidth(this.$tiles.not('.is-selected').filter('.tile--big'), this.bigTileSize);
 		},
 
-		"setRightScrollBounds": function() {
-			this.rightScrollBounds = this.$gallery.outerWidth() - this.$container.width();
-			this.onScroll();
-		},
-
 		"setHeaderDims": function() {
 			if (this.orientation === 'landscape') {
 				if (this.gallerySize > this.options.tilesPerAxisBreakPoint) {
@@ -234,8 +290,24 @@ define([
 		},
 
 		"setGalleryDims": function() {
+			var minTilesPerRow,
+				minGalleryWidth,
+				currGalleryWidth;
+
 			if (this.orientation === 'landscape') {
 				this.$gallery.height(this.gallerySize);
+				if (this.gallerySize > this.options.tilesPerAxisBreakPoint) {
+					minTilesPerRow = Math.ceil((this.$tiles.length + 5) / 3) + 2;
+				} else {
+					minTilesPerRow = Math.ceil((this.$tiles.length + 2) / 2) + 1;
+				}
+
+				minGalleryWidth = minTilesPerRow * this.tileSize + (minTilesPerRow - 1) * this.gutter;
+
+				currGalleryWidth = this.$gallery.width();
+				if(currGalleryWidth < minGalleryWidth) {
+					this.$gallery.width(minGalleryWidth);
+				}
 			} else {
 				this.$gallery.height('auto');
 			}
@@ -253,6 +325,7 @@ define([
 					this.selectTile($(event.currentTarget));
 				}
 			}
+			this.scrollToTile($(event.currentTarget));
 		},
 
 		"setTileWidth": function($tile, width) {
@@ -261,6 +334,7 @@ define([
 		},
 
 		"deselectTile": function() {
+			this.$gallery.removeClass('has-selected');
 			this.$tiles.removeClass('is-selected');
 			this.setTileWidth(this.$tiles.not('.tile--big'), this.tileSize);
 			this.setTileWidth(this.$tiles.filter('.tile--big'), this.bigTileSize);
@@ -271,9 +345,9 @@ define([
 		"selectTile": function($tile) {
 			var currColumn,
 				targetOffset,
-				$tileInner = $tile.children('.tile__img-holder'),
 				tilePos = $tile.position();
 
+			this.$gallery.addClass('has-selected');
 			$tile.addClass('is-selected').addClass('is-enlarged');
 			$tile.removeClass('is-row-1 is-row-2 is-row-3 is-col-1 is-col-2 is-col-3');
 
@@ -327,7 +401,7 @@ define([
 
 	};
 
-	_.bindAll(app, 'init', 'onClick', 'onResize', 'onLayoutComplete', 'onCategoryButtonClick', 'scrollRight', 'scrollLeft', 'onKeyUp', 'onScroll', 'setRightScrollBounds', 'onTransitionend');
+	_.bindAll(app, 'init', 'onClick', 'onResize', 'onLayoutComplete', 'onCategoryButtonClick', 'scrollRight', 'scrollLeft', 'onKeyUp', 'onTileTransitionend', 'onGalleryTransitionend', 'scrollTo', 'fitIt', 'setScrollButtonStates', 'checkGalleryOffset');
 
 	return app;
 
