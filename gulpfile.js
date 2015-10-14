@@ -2,7 +2,10 @@ var gulp = require('gulp');
 var gulpLoadPlugins = require('gulp-load-plugins')
 var $ = gulpLoadPlugins();
 var del = require('del');
+var fs = require('fs');
 
+var requireDir = require('require-dir');
+requireDir('./tasks');
 
 gulp.task('connectDev', function() {
 	$.connect.server({
