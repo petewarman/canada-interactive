@@ -33,7 +33,7 @@ define([
 			"scrollLeftButtonSelector": ".gallery__prev",
 			"tilesPerAxisBreakPoint": 500,
 			"gutter": 10,
-			"landscapeMaxHeight": 700
+			"landscapeMaxHeight": 750
 		});
 	};
 
