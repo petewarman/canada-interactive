@@ -136,7 +136,7 @@
 		opacity: 1;
 		width: 100%;
 		height: 100%;
-		transition: visibility 0s #{ $stage2Delay + $stage2Duration }, opacity 0.3s #{ $stage2Delay + $stage2Duration };
+		transition: visibility 0s ($stage2Delay + $stage2Duration), opacity 0.3s ($stage2Delay + $stage2Duration);
 	}
 }
 
