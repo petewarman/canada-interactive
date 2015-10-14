@@ -64,8 +64,8 @@ gulp.task('bootjs', function(){
 gulp.task('requirejs', $.shell.task(['r.js -o build.js']))
 
 gulp.task('scripts', ['requirejs'], function() {
-	// gulp.src('./src/scripts/vendor/requirejs/require.js')
-	// 	.pipe(gulp.dest('./dist/scripts/vendor/requirejs'));
+	gulp.src('./src/vendor/requirejs/require.js')
+		.pipe(gulp.dest('./dist/vendor/requirejs'));
 });
 
 gulp.task('build', ['clean'], function(){
