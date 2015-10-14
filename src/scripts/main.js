@@ -24,6 +24,7 @@ define([
 		app.init({
 			"interactiveEl": interactiveEl,
 			"tileSelector": ".tile",
+			"tileImgHolderClass": "tile__img-holder",
 			"gallerySelector": '.gallery',
 			"containerSelector": ".gallery-container",
 			"interactiveContainerSelector": ".interactive-container",
