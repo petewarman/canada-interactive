@@ -17,6 +17,8 @@
     "gulp-uglify": "^1.1.0"
   },
   "dependencies": {
+    "jquery": "^2.1.4",
+    "jsdom": "^3.1.2",
     "requirejs": "^2.1.20"
   }
 }
