@@ -19,7 +19,7 @@
 			</header>
 
 			{{#each tiles}}
-				<div class="tile cat-{{ this.categoryId }} {{#if this.isBig}}tile--big{{/if}}">
+				<div class="tile tile-{{ @index }} cat-{{ this.categoryId }} {{#if this.isBig}}tile--big{{/if}}">
 					<span class="tile__img-holder"><img src="{{ this.imgUrl }}" alt="{{ this.imgAlt }}" /></span>
 					<div class="tile__details">
 						<h2 class="tile__title"><span class="tile__text-holder">{{ this.name }}</span></h2>
