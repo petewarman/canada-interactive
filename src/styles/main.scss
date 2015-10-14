@@ -30,12 +30,22 @@ body, html {
 .gallery-container {
 	//width: 80%;
 	margin: 0 auto;
-	overflow-x: auto;
+	overflow-x: hidden;
 }
 
 .gallery {
 	border: $gutter solid #fff;
 	background: $white;
+	transition-property: transform;
+	transition-duration: $stage2Duration;
+	transition-delay: $stage2Delay;
+	transition-timing-function: $stage2Ease;
+
+	&.has-selected {
+		transition-duration: $stage1Duration;
+		transition-delay: $stage1Delay;
+		transition-timing-function: $stage1Ease;
+	}
 }
 
 .gallery__next,

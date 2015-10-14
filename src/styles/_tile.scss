@@ -13,13 +13,26 @@
 	-webkit-backface-visibility: hidden;
 	transition: opacity 0.5s;
 
+	transition-delay: $stage2Delay !important;
+	transition-duration: $stage2Duration !important;
+	transition-timing-function: $stage2Ease !important;
+
 	&.is-inactive {
 		opacity: 0.1;
 	}
 
 	&.is-enlarged {
-		transition: none !important;
+		&:not(.tile-0) {
+			transition: none !important;
+		}
 		z-index: 1;
+
+	}
+
+	.has-selected & {
+		transition-delay: $stage1Delay !important;
+		transition-duration: $stage1Duration !important;
+		transition-timing-function: $stage1Ease !important;
 	}
 }
 
@@ -35,9 +48,19 @@
 	top: 0;
 
 	.layout-complete & {
-		transition: width 0.4s linear, height 0.4s linear;
+		transition: width 0.4s 0s, height 0.4s 0s;
 		transform: translateZ(0);
 		-webkit-backface-visibility: hidden;
+
+		transition-delay: $stage1Delay;
+		transition-duration: $stage1Duration;
+		transition-timing-function: $stage1Ease;
+	}
+
+	.is-selected & {
+		transition-delay: $stage2Delay;
+		transition-duration: $stage2Duration;
+		transition-timing-function: $stage2Ease;
 	}
 
 	img {
@@ -54,7 +77,7 @@
 		filter: grayscale(100%);
 	}
 
-	.is-selected:hover & img {
+	.is-enlarged:hover & img {
 		opacity: 1;
 		filter: none;
 	}
@@ -113,7 +136,7 @@
 		opacity: 1;
 		width: 100%;
 		height: 100%;
-		transition: visibility 0s 0.4s, opacity 0.3s 0.4s;
+		transition: visibility 0s 0.8s, opacity 0.3s 0.8s;
 	}
 }
 
@@ -261,6 +284,10 @@
 	.is-selected:hover & {
 		opacity: 0;
 		transform: scale(0.5);
+	}
+
+	.is-enlarged & {
+		display: none;
 	}
 }
 
