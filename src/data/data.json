@@ -21,27 +21,6 @@
 	"tiles": [
 		{
 			"categoryId": 1,
-			"imgUrl": "images/LOWRES_Interactive_BC_4639.jpg",
-			"imgAlt": "Image alt text",
-			"name": "Event Name",
-			"date": "Event Date",
-			"description": "Description lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
-			"links": [
-				{
-					"text": "Link 1",
-					"url": "#1"
-				},
-				{
-					"text": "Link 2",
-					"url": "#2"
-				}
-			],
-			"location": "Location",
-			"location-marker-x": 70,
-			"location-marker-y": 70
-		},
-		{
-			"categoryId": 1,
 			"isBig": true,
 			"imgUrl": "images/LOWRES_Interactive_BC_5636.jpg",
 			"imgAlt": "Image alt text",
@@ -227,6 +206,19 @@
 				}
 			],
 			"location": "Location",
+			"location-marker-x": 30,
+			"location-marker-y": 66
+		},
+		{
+			"categoryId": 3,
+			"imgUrl": "images/LOWRES_Interactive_BC_4639.jpg",
+			"imgAlt": "Image alt text",
+			"videoUrl": "videos/test.mp4",
+			"videoPosterUrl": "videos/test.jpg",
+			"name": "Bear dancing festival",
+			"date": "Late August",
+			"description": "",
+			"location": "Jasper National Park",
 			"location-marker-x": 30,
 			"location-marker-y": 66
 		}

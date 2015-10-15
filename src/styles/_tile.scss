@@ -72,6 +72,18 @@
 		transition: opacity 0.3s;
 	}
 
+	video {
+		display: none;
+		width: 100%;
+		position: absolute;
+		left: 0;
+		top: 0;
+	}
+
+	.is-selected & video {
+		display: block;
+	}
+
 	.tile:hover & img {
 		opacity: 0.3;
 		filter: grayscale(100%);
@@ -80,6 +92,10 @@
 	.is-enlarged:hover & img {
 		opacity: 1;
 		filter: none;
+	}
+
+	.tile.is-playing & img {
+		opacity: 0;
 	}
 
 	.is-row-1 & {
@@ -118,6 +134,67 @@
 
 }
 
+.tile__video-control {
+	$size: 40px;
+	$size-big: 100px;
+
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: $size;
+	height: $size;
+	margin: $size/(-2) 0 0 $size/(-2);
+	background: $canada-red;
+	border-radius: 50%;
+	z-index: 2;
+	transition: all 0.3s;
+	opacity: 0;
+	cursor: pointer;
+
+	svg {
+		display: block;
+		width: 60%;
+		height: 60%;
+		margin: 20%;
+
+		.play,
+		.pause {
+			fill: $white;
+		}
+	}
+
+	.pause {
+		display: none;
+	}
+
+	.tile:not(.is-inactive):hover & {
+		opacity: 1;
+	}
+
+	.is-selected & {
+		//opacity: 1;
+		width: $size-big;
+		height: $size-big;
+		margin: $size-big/(-2) 0 0 $size-big/(-2);
+	}
+
+	.is-playing & {
+		width: $size;
+		height: $size;
+		left: 0;
+		top: 100%;
+		margin: (-10px - $size) 0 0 10px;
+
+		.play {
+			display: none;
+		}
+
+		.pause {
+			display: block;
+		}
+	}
+}
+
 .tile__details {
 	position: absolute;
 	left: 0;
@@ -135,7 +212,9 @@
 		visibility: visible;
 		opacity: 1;
 		width: 100%;
-		height: 100%;
+		height: auto;
+		max-height: 100%;
+		min-height: 170px;
 		transition: visibility 0s ($stage2Delay + $stage2Duration), opacity 0.3s ($stage2Delay + $stage2Duration);
 	}
 }

@@ -20,21 +20,47 @@
 
 			{{#each tiles}}
 				<div class="tile tile-{{ @index }} cat-{{ this.categoryId }} {{#if this.isBig}}tile--big{{/if}}">
-					<span class="tile__img-holder"><img src="{{ this.imgUrl }}" alt="{{ this.imgAlt }}" /></span>
+					<span class="tile__img-holder">
+						{{#if this.videoUrl}}
+							<video src="{{ this.videoUrl }}" loop poster="{{ this.imgUrl }}" webkit-playsinline>
+								{{ this.imgAlt }}
+							</video>
+							<span class="tile__video-control">
+								<svg viewBox="0 0 80 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+									<polygon class="play" points="25 0 70 40 25 80 "></polygon>
+									<g class="pause">
+										<rect x="10" y="10" width="20" height="60"></rect>
+										<rect x="50" y="10" width="20" height="60"></rect>
+									</g>
+								</svg>
+							</span>
+						{{/if}}
+						<img src="{{ this.imgUrl }}" alt="{{ this.imgAlt }}" />
+					</span>
 					<div class="tile__details">
-						<h2 class="tile__title"><span class="tile__text-holder">{{ this.name }}</span></h2>
-						<p class="tile__date"><span class="tile__text-holder">{{ this.date }}</span></p>
+						{{#if this.name}}
+							<h2 class="tile__title"><span class="tile__text-holder">{{ this.name }}</span></h2>
+						{{/if}}
+						{{#if this.date}}
+							<p class="tile__date"><span class="tile__text-holder">{{ this.date }}</span></p>
+						{{/if}}
+						{{#if this.description}}
 						<p class="tile__description"><span class="tile__text-holder">{{ this.description }}</span></p>
+						{{/if}}
+						{{#if this.links}}
 						<ul class="tile__links">
 							{{#each this.links}}
 							<li class="tile__link-item"><a class="tile__link tile__text-holder" href="{{ this.url }}">{{ this.text }}</a></li>
 							{{/each}}
 						</ul>
+						{{/if}}
+						{{#if this.location}}
 						<div class="tile__location">
 							<img class="tile__location-map" src="icons/map.svg" />
 							<span class="tile__location-marker" style="left:{{ this.location-marker-x }}%; top:{{ this.location-marker-y }}%;"></span>
 							<p class="tile__location-text"><span class="tile__text-holder">{{ this.location }}</span></p>
 						</div>
+						{{/if}}
 					</div>
 					<span class="tile__expander"></span>
 				</div>
