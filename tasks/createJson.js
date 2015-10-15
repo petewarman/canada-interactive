@@ -40,7 +40,7 @@ function parseResponse(data) {
 				tiles.push( formatData($rows.eq(i).find('td')) );
 			}
 		}
-
+		tiles[1].isBig = true;
 		base.tiles = tiles;
 
 		fs.writeFileSync('./src/data/data.json', JSON.stringify(base));
@@ -48,29 +48,39 @@ function parseResponse(data) {
 }
 
 function formatData($cells) {
-	return {
+	var obj = {
 		"name": $cells.eq(0).text(),
 		"date": $cells.eq(1).text(),
 		"description": $cells.eq(2).text(),
-		"links": [
-			{
-				"text": $cells.eq(3).text(),
-				"url": $cells.eq(4).text()
-			},
-			{
-				"text": $cells.eq(5).text(),
-				"url": $cells.eq(6).text()
-			}
-		],
 		"location": $cells.eq(7).text(),
 		"location-marker-x": $cells.eq(8).text(),
 		"location-marker-y": $cells.eq(9).text(),
 		"categoryId": $cells.eq(10).text(),
 		"imgUrl": 'images/' + $cells.eq(11).text(),
-		"imgAlt": $cells.eq(12).text()
+		"imgAlt": $cells.eq(12).text(),
 		"videoUrl": 'images/' + $cells.eq(13).text(),
 		"videoPosterUrl": $cells.eq(14).text()
 	};
+
+	if($cells.eq(3).text() || $cells.eq(5).text()) {
+		obj.links = [];
+
+		if($cells.eq(3).text()) {
+			obj.links.push({
+				"text": $cells.eq(3).text(),
+				"url": $cells.eq(4).text()
+			});
+		}
+
+		if($cells.eq(5).text()) {
+			obj.links.push({
+				"text": $cells.eq(5).text(),
+				"url": $cells.eq(6).text()
+			});
+		}
+	}
+
+	return obj;
 }
 
 gulp.task('createJson', function() {
