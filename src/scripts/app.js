@@ -70,6 +70,12 @@ define([
 
 		"onGalleryTransitionend": function(e) {
 			if(e.target === this.$gallery.get(0)) {
+				if(this.$tileToShow) {
+					this.selectTile(this.$tileToShow);
+					this.scrollToTile(this.$tileToShow);
+					delete this.$tileToShow;
+				}
+
 				this.setScrollButtonStates();
 			}
 		},
@@ -103,6 +109,9 @@ define([
 				this.tryToPlayOrPauseTileVideo($tile);
 				return;
 			} else if (this.$tiles.hasClass('is-selected')) {
+				if (!$tile.hasClass('is-inactive')) {
+					this.$tileToShow = $tile;
+				}
 				this.tryToPauseTileVideo(this.$tiles.filter('.is-selected'));
 				this.deselectTile();
 			} else {
