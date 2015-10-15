@@ -97,14 +97,20 @@ define([
 		},
 
 		"onTileClick": function(event) {
-			if (this.$tiles.hasClass('is-selected')) {
+			var $tile = $(event.currentTarget);
+
+			if($tile.hasClass('is-selected')) {
+				this.tryToPlayOrPauseTileVideo($tile);
+				return;
+			} else if (this.$tiles.hasClass('is-selected')) {
+				this.tryToPauseTileVideo(this.$tiles.filter('.is-selected'));
 				this.deselectTile();
 			} else {
-				if (!$(event.currentTarget).hasClass('is-inactive')) {
-					this.selectTile($(event.currentTarget));
+				if (!$tile.hasClass('is-inactive')) {
+					this.selectTile($tile);
 				}
 			}
-			this.scrollToTile($(event.currentTarget));
+			this.scrollToTile($tile);
 		},
 
 		"onCategoryButtonClick": function(event) {
@@ -393,6 +399,43 @@ define([
 			}
 			//this.$gallery.packery('sortItems');
 			this.$gallery.packery();
+			this.tryToPlayTileVideo($tile);
+		},
+
+		"tryToPlayOrPauseTileVideo": function($tile) {
+			var $video = $tile.find('video'),
+				vidEl;
+
+			if($video.length > 0) { 
+				vidEl = $video.get(0);
+
+				if(vidEl.paused) {
+					this.tryToPlayTileVideo($tile);
+				} else {
+					this.tryToPauseTileVideo($tile);
+				}
+			}
+		},
+
+		"tryToPlayTileVideo": function($tile) {
+			var $video = $tile.find('video');
+
+			if($video.length > 0) { 
+				$video.get(0).play();
+				$tile.addClass('is-playing');
+				$video.one('pause ended', function() {
+					$tile.removeClass('is-playing');
+				});
+			}
+		},
+
+		"tryToPauseTileVideo": function($tile) {
+			var $video = $tile.find('video');
+
+			if($video.length > 0) { 
+				$video.get(0).pause();
+				//$tile.removeClass('is-playing');
+			}
 		}
 
 	};
