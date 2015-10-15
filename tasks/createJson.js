@@ -68,6 +68,8 @@ function formatData($cells) {
 		"categoryId": $cells.eq(10).text(),
 		"imgUrl": 'images/' + $cells.eq(11).text(),
 		"imgAlt": $cells.eq(12).text()
+		"videoUrl": 'images/' + $cells.eq(13).text(),
+		"videoPosterUrl": $cells.eq(14).text()
 	};
 }
 
