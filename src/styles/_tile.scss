@@ -12,13 +12,14 @@
 	transform: translateZ(0);
 	-webkit-backface-visibility: hidden;
 	transition: opacity 0.5s;
-
 	transition-delay: $stage2Delay !important;
 	transition-duration: $stage2Duration !important;
 	transition-timing-function: $stage2Ease !important;
+	cursor: pointer;
 
 	&.is-inactive {
 		opacity: 0.1;
+		cursor: auto
 	}
 
 	&.is-enlarged {
@@ -26,7 +27,7 @@
 			transition: none !important;
 		}
 		z-index: 1;
-
+		cursor: auto;
 	}
 
 	.has-selected & {
@@ -89,7 +90,8 @@
 		filter: grayscale(100%);
 	}
 
-	.is-enlarged:hover & img {
+	.is-enlarged:hover & img,
+	.is-inactive:hover & img {
 		opacity: 1;
 		filter: none;
 	}
@@ -364,6 +366,7 @@
 		transform: scale(0.5);
 	}
 
+	.is-inactive &,
 	.is-enlarged & {
 		display: none;
 	}
