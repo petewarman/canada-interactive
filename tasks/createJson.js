@@ -48,20 +48,11 @@ function parseResponse(data) {
 }
 
 function formatData($cells) {
-	var obj = {
-		"name": $cells.eq(0).text(),
-		"date": $cells.eq(1).text(),
-		"description": $cells.eq(2).text(),
-		"location": $cells.eq(7).text(),
-		"location-marker-x": $cells.eq(8).text(),
-		"location-marker-y": $cells.eq(9).text(),
-		"categoryId": $cells.eq(10).text(),
-		"imgUrl": 'images/' + $cells.eq(11).text(),
-		"imgAlt": $cells.eq(12).text(),
-		"videoUrl": 'images/' + $cells.eq(13).text(),
-		"videoPosterUrl": $cells.eq(14).text()
-	};
+	var obj = {};
 
+	if($cells.eq(0).text()) { obj.name = $cells.eq(0).text(); }
+	if($cells.eq(1).text()) { obj.date = $cells.eq(1).text(); }
+	if($cells.eq(2).text()) { obj.description = $cells.eq(2).text(); }
 	if($cells.eq(3).text() || $cells.eq(5).text()) {
 		obj.links = [];
 
@@ -79,6 +70,13 @@ function formatData($cells) {
 			});
 		}
 	}
+	if($cells.eq(7).text()) { obj.location = $cells.eq(7).text(); }
+	if($cells.eq(8).text()) { obj['location-marker-x'] = $cells.eq(8).text(); }
+	if($cells.eq(9).text()) { obj['location-marker-y'] = $cells.eq(9).text(); }
+	if($cells.eq(10).text()) { obj.categoryId = $cells.eq(10).text(); }
+	if($cells.eq(11).text()) { obj.imgUrl = 'images/' + $cells.eq(11).text(); }
+	if($cells.eq(12).text()) { obj.imgAlt = $cells.eq(12).text(); }
+	if($cells.eq(13).text()) { obj.videoUrl = 'videos/' + $cells.eq(13).text(); }
 
 	return obj;
 }
