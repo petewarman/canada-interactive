@@ -49,33 +49,80 @@ define([
 			this.addEventListeners();
 		},
 
+	/* Set Up */
+
+		"getElementRefs": function() {
+			this.$tiles = $(this.options.tileSelector);
+			this.$interactiveContainer = $(this.options.interactiveContainerSelector);
+			this.$gallery = $(this.options.gallerySelector);
+			this.$container = $(this.options.containerSelector);
+			this.$header = $(this.options.headerSelector);
+			this.$catButtons = $(this.options.catButtonSelector);
+			this.$scrollRightButton = $(this.options.scrollRightButtonSelector);
+			this.$scrollLeftButton = $(this.options.scrollLeftButtonSelector);
+			this.$tileImgHolders = $(this.options.tileImgHolderSelector);
+		},
+
 		"addEventListeners": function (){
 			$(window).on('resize', _.debounce(this.onResize, 300));
 			this.$catButtons.on('click', this.onCategoryButtonClick);
 			this.$scrollRightButton.on('click', this.scrollRight);
 			this.$scrollLeftButton.on('click', this.scrollLeft);
 			$(document).on('keydown', this.options.interactiveContainerSelector, this.onKeyUp);
-			this.$tileImgHolders.on('transitionend', _.debounce(this.onTileTransitionend, 200))
+			this.$tiles.on('transitionend', _.debounce(this.onTileTransitionend, 200))
+			this.$tileImgHolders.on('transitionend', _.debounce(this.onTileImgHolderTransitionend, 200))
 			this.$gallery.on('transitionend', this.onGalleryTransitionend);
+			//this.$container.on('mousewheel DOMMouseScroll', this.onGalleryMouseWheel);
 		},
 
 	/* Event Handlers */
 
-		"onTileTransitionend": function (e) {
-			if($(e.target).hasClass(this.options.tileImgHolderClass)) {
+		"onGalleryMouseWheel": function(e) {
+			if(this.orientation === 'landscape') {
+				var deltaX = e.originalEvent.wheelDeltaX;
+				var deltaY = e.originalEvent.wheelDeltaY;
+				var delta = deltaX || -e.originalEvent.detail;
+
+				if(!this._oldMouseWheelDelta || delta > this._oldMouseWheelDelta) {
+
+					if(Math.abs(deltaX) > Math.abs(deltaY) || e.originalEvent.axis === 1) {
+						e.preventDefault();
+						e.stopPropagation();
+
+						if(delta < 0) { this.scrollRight(); }
+						if(delta > 0) { this.scrollLeft(); }
+					}
+				}
+
+				this._oldMouseWheelDelta = delta;
+
+			}
+		},
+
+		"onTileTransitionend": function(e) {
+			if($(e.target).is(this.options.tileSelector)) {
+				if(!this._isScrolling) {
+					this.checkTileToShow();
+					this.checkGalleryOffset();
+					this.setScrollButtonStates();
+				}
+			}
+		},
+
+		"onTileImgHolderTransitionend": function (e) {
+			if($(e.target).is(this.options.tileImgHolderSelector)) {
 				this.$tiles.not('.is-selected').removeClass('is-enlarged');
-				_.defer(this.setScrollButtonStates);
+				if(!this._isScrolling) {
+					this.checkGalleryOffset();
+					this.setScrollButtonStates();
+				}
 			}
 		},
 
 		"onGalleryTransitionend": function(e) {
-			if(e.target === this.$gallery.get(0)) {
-				if(this.$tileToShow) {
-					this.selectTile(this.$tileToShow);
-					this.scrollToTile(this.$tileToShow);
-					delete this.$tileToShow;
-				}
-
+			if(!e || $(e.target).is(this.options.gallerySelector)) {
+				this._isScrolling = false;
+				this.checkTileToShow();
 				this.setScrollButtonStates();
 			}
 		},
@@ -117,9 +164,9 @@ define([
 			} else {
 				if (!$tile.hasClass('is-inactive')) {
 					this.selectTile($tile);
+					delete this.$tileToShow;
 				}
 			}
-			this.scrollToTile($tile);
 		},
 
 		"onCategoryButtonClick": function(event) {
@@ -153,17 +200,7 @@ define([
 			}
 		},
 
-		"getElementRefs": function() {
-			this.$tiles = $(this.options.tileSelector);
-			this.$interactiveContainer = $(this.options.interactiveContainerSelector);
-			this.$gallery = $(this.options.gallerySelector);
-			this.$container = $(this.options.containerSelector);
-			this.$header = $(this.options.headerSelector);
-			this.$catButtons = $(this.options.catButtonSelector);
-			this.$scrollRightButton = $(this.options.scrollRightButtonSelector);
-			this.$scrollLeftButton = $(this.options.scrollLeftButtonSelector);
-			this.$tileImgHolders = $('.' + this.options.tileImgHolderClass);
-		},
+	/* Gallery offset "scrolling" */
 
 		"setScrollButtonStates": function() {
 			var bounds = this.getGalleryOffsetBounds();
@@ -185,7 +222,7 @@ define([
 		},
 
 		"getCurrGalleryOffset": function() {
-			return this.$gallery.data('offset') || 0;
+			return this._galleryOffset || 0;
 		},
 
 		"getGalleryOffsetBounds": function() {
@@ -201,10 +238,25 @@ define([
 			return Math.min(bounds.upper, Math.max(bounds.lower, offset));
 		},
 
+		"checkGalleryOffset": function() {
+			var offset = this.getCurrGalleryOffset(),
+				newOffset = this.constrainGalleryOffset(offset);
+
+			if(offset !== newOffset) {
+				this.scrollTo(newOffset);
+			} else {
+				this.setScrollButtonStates();
+			}
+		},
+
 		"scrollTo": function(offset) {
-			//this.$gallery.css({'left': this.constrainGalleryOffset(offset) + 'px'});
 			var newOffset = this.constrainGalleryOffset(offset);
-			this.$gallery.css({'transform': 'translateX(' + newOffset + 'px)'}).data('offset', newOffset);
+
+			if(newOffset !== this._galleryOffset) {
+				this._galleryOffset = newOffset;
+				this._isScrolling = true;
+				this.$gallery.css({'transform': 'translateX(' + newOffset + 'px)'});
+			}
 		},
 
 		"scrollRight": function() {
@@ -229,9 +281,12 @@ define([
 			if (this.orientation === 'landscape' && $tile.length > 0) {
 				this.scrollTo(($tile.position().left * -1) + ((this.$container.width() - $tile.width()) / 2));
 			} else {
-				$('html, body').stop(true, false).animate({'scrollTop': $tile.offset().top - ((this.winHeight - $tile.width()) / 2)}, 400, 'linear');
+				this._isScrolling = true;
+				$('html, body').stop(true, false).animate({'scrollTop': $tile.offset().top - ((this.winHeight - $tile.width()) / 2)}, 800, 'linear', this.onGalleryTransitionend);
 			}
 		},
+
+	/* Layout */
 
 		"determineOrientation": function() {
 			this.winHeight = $(window).height();
@@ -267,17 +322,6 @@ define([
 			this.$gallery.removeClass('layout-complete');
 			this.$gallery.off( 'click', this.options.tileSelector, this.onTileClick);
 			this.$gallery.packery('destroy');
-		},
-
-		"checkGalleryOffset": function() {
-			var offset = this.getCurrGalleryOffset(),
-				newOffset = this.constrainGalleryOffset(offset);
-
-			if(offset !== newOffset) {
-				this.scrollTo(newOffset);
-			} else {
-				this.setScrollButtonStates();
-			}
 		},
 
 		"setOrientation": function(orientation) {
@@ -362,8 +406,10 @@ define([
 
 		"setTileWidth": function($tile, width) {
 			$tile.width(width).height(width);
-			$tile.find('.' + this.options.tileImgHolderClass).width(width).height(width);
+			$tile.find(this.options.tileImgHolderSelector).width(width).height(width);
 		},
+
+	/* tile selection/deselection */
 
 		"deselectTile": function() {
 			this.$gallery.removeClass('has-selected');
@@ -409,7 +455,21 @@ define([
 			//this.$gallery.packery('sortItems');
 			this.$gallery.packery();
 			this.tryToPlayTileVideo($tile);
+			this.scrollToTile($tile);
 		},
+
+		"checkTileToShow": function() {
+			if(this.$tileToShow) {
+				if(this.$tiles.filter('.is-selected').length > 0) {
+					this.deselectTile();
+				} else {
+					this.selectTile(this.$tileToShow);
+					delete this.$tileToShow;
+				}
+			}
+		},
+
+	/* Video controllers */
 
 		"tryToPlayOrPauseTileVideo": function($tile) {
 			var $video = $tile.find('video'),
@@ -449,7 +509,24 @@ define([
 
 	};
 
-	_.bindAll(app, 'init', 'onTileClick', 'onResize', 'onLayoutComplete', 'onCategoryButtonClick', 'scrollRight', 'scrollLeft', 'onKeyUp', 'onTileTransitionend', 'onGalleryTransitionend', 'scrollTo', 'setScrollButtonStates', 'checkGalleryOffset');
+	_.bindAll(
+		app,
+		'init',
+		'onTileClick',
+		'onResize',
+		'onLayoutComplete',
+		'onCategoryButtonClick',
+		'scrollRight',
+		'scrollLeft',
+		'onKeyUp',
+		'onTileImgHolderTransitionend',
+		'onGalleryTransitionend',
+		'onTileTransitionend',
+		'scrollTo',
+		'setScrollButtonStates',
+		'checkGalleryOffset',
+		'onGalleryMouseWheel'
+	);
 
 	return app;
 
