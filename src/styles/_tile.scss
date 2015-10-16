@@ -227,29 +227,29 @@
 	.tile__title &,
 	.tile__date &,
 	.tile__location-text & {
-		background: $canada-red;
+		background: rgba($canada-red, 0.75);
 		color: $white;
-		box-shadow: ($text-padding * -1) 0 0 $canada-red, $text-padding 0 0 $canada-red;
+		box-shadow: ($text-padding * -1) 0 0 rgba($canada-red, 0.75), $text-padding 0 0 rgba($canada-red, 0.75);
 	}
 
 	.cat-1 .tile__description &,
 	.cat-1 .tile__link-item & {
-		background: $cat-1-color;
-		box-shadow: ($text-padding * -1) 0 0 $cat-1-color, $text-padding 0 0 $cat-1-color;
+		background: rgba($cat-1-color, 0.75);
+		box-shadow: ($text-padding * -1) 0 0 rgba($cat-1-color, 0.75), $text-padding 0 0 rgba($cat-1-color, 0.75);
 		color: $white;
 	}
 
 	.cat-2 .tile__description &,
 	.cat-2 .tile__link-item & {
-		background: $cat-2-color;
-		box-shadow: ($text-padding * -1) 0 0 $cat-2-color, $text-padding 0 0 $cat-2-color;
+		background: rgba($cat-2-color, 0.75);
+		box-shadow: ($text-padding * -1) 0 0 rgba($cat-2-color, 0.75), $text-padding 0 0 rgba($cat-2-color, 0.75);
 		color: $white;
 	}
 
 	.cat-3 .tile__description &,
 	.cat-3 .tile__link-item & {
-		background: $cat-3-color;
-		box-shadow: ($text-padding * -1) 0 0 $cat-3-color, $text-padding 0 0 $cat-3-color;
+		background: rgba($cat-3-color, 0.75);
+		box-shadow: ($text-padding * -1) 0 0 rgba($cat-3-color, 0.75), $text-padding 0 0 rgba($cat-3-color, 0.75);
 		color: $white;
 	}
 }
