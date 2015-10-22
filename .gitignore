@@ -3,3 +3,4 @@ node_modules
 dist
 src/vendor
 src/styles/main.css
+src/images

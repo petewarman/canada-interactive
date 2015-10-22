@@ -30,6 +30,7 @@ define([
 			"interactiveContainerSelector": ".interactive-container",
 			"headerSelector": ".header",
 			"catButtonSelector": ".header__category-button",
+			"tileCollapseButtonSelector": ".tile__expander",
 			"scrollRightButtonSelector": ".gallery__next",
 			"scrollLeftButtonSelector": ".gallery__prev",
 			"tilesPerAxisBreakPoint": 500,

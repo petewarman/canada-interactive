@@ -42,7 +42,7 @@ gulp.task('icons', function(){
 });
 
 gulp.task('images', function () {
-    return gulp.src('./src/images/*')
+    return gulp.src('./src/images/**')
         .pipe($.imagemin({
             progressive: true
         }))
@@ -50,7 +50,7 @@ gulp.task('images', function () {
 });
 
 gulp.task('videos', function () {
-    return gulp.src('./src/videos/*')
+    return gulp.src('./src/videos/**')
         .pipe(gulp.dest('./dist/videos'));
 });
 
