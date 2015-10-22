@@ -27,8 +27,16 @@ body, html {
 	font-family: 'Guardian Agate Sans 1 Web', sans-serif;
 }
 
+button {
+	font-family: inherit;
+}
+
+.interactive-container {
+	position: relative;
+}
+
 .gallery-container {
-	//width: 80%;
+	transform: translateX(0);
 	margin: 0 auto;
 	overflow: hidden;
 }

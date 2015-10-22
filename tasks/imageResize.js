@@ -4,17 +4,6 @@ var rename = require("gulp-rename");
 var del = require('del');
 var settings = require('../settings.js');
 var sizes = settings.assetSizes.images;
-// [
-// 	1024,
-// 	840,
-// 	768,
-// 	640,
-// 	480,
-// 	320,
-// 	240,
-// 	160,
-// 	100
-// ];
 
 gulp.task('imageResize', function () {
 

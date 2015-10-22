@@ -1,29 +1,31 @@
 <div class="interactive-container" tabindex="0">
+		<header class="header">
+			<button type="button" class="header__reset header__button">
+				<span class="icon"><img src="icons/reset.svg" /></span>
+				<span class="text">reset</span>
+			</button>
+			<ul class="header__category-list">
+			{{#each categories}}
+				<li class="header__category-item">
+					<button data-tile-class="cat-{{ this.id }}" type="button" class="header__button header__category-button header__category-button--{{ this.id }} is-active">
+						<span class="icon">
+							<img src="icons/{{ this.icon }}.svg" />
+						</span>
+						<span class="text">{{ this.text }}</span>
+					</button>
+				</li>
+			{{/each}}
+			</ul>
+		</header>
 	<div class="gallery-container">
-		<div class="gallery">
-			<header class="header">
-				<h1 class="header__title">{{{ headerTitle }}}</h1>
-				<p class="header__description">{{{ headerDescription }}}</p>
-				<ul class="header__category-list">
-				{{#each categories}}
-					<li class="header__category-item">
-						<button data-tile-class="cat-{{ this.id }}" type="button" class="header__category-button header__category-button--{{ this.id }}">
-							<span class="icon">
-								<img src="icons/{{ this.icon }}.svg" />
-							</span>
-							<span class="text">{{ this.text }}</span>
-						</button>
-					</li>
-				{{/each}}
-				</ul>
-			</header>
 
+		<div class="gallery">
 			{{#each tiles}}
-				<div class="tile tile-{{ @index }} cat-{{ this.categoryId }} {{#if this.isBig}}tile--big{{/if}}">
+				<div class="tile tile-{{ @index }} cat-{{ this.categoryId }} {{#if this.isBig}}tile--big{{/if}}" tabindex="0">
 					<span class="tile__img-holder">
-						{{#if this.videoUrl}}
-							<video src="{{ this.videoUrl }}" loop poster="{{ this.imgUrl }}" webkit-playsinline>
-								{{ this.imgAlt }}
+						{{#if this.video }}
+							<video data-filename="{{ this.video }}" src="" loop poster="{{ this.img }}" webkit-playsinline>
+								{{ this.img }}
 							</video>
 							<span class="tile__video-control">
 								<svg viewBox="0 0 80 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -32,10 +34,24 @@
 										<rect x="10" y="10" width="20" height="60"></rect>
 										<rect x="50" y="10" width="20" height="60"></rect>
 									</g>
+									<g class="load">
+										<rect x="38" y="0" width="4" height="20"></rect>
+										<path d="M58.2679492,4.35898385 L61.7320508,6.35898385 L51.7320508,23.6794919 L48.2679492,21.6794919 L58.2679492,4.35898385 Z" opacity="0.9"></path>
+										<path d="M73.6410162,18.2679492 L75.6410162,21.7320508 L58.3205081,31.7320508 L56.3205081,28.2679492 L73.6410162,18.2679492 Z" opacity="0.8"></path>
+										<path d="M80,38 L80,42 L60,42 L60,38 L80,38 Z" opacity="0.7"></path>
+										<path d="M75.6410162,58.2679492 L73.6410162,61.7320508 L56.3205081,51.7320508 L58.3205081,48.2679492 L75.6410162,58.2679492 Z" opacity="0.6"></path>
+										<path d="M61.7320508,73.6410162 L58.2679492,75.6410162 L48.2679492,58.3205081 L51.7320508,56.3205081 L61.7320508,73.6410162 Z" opacity="0.5"></path>
+										<rect opacity="0.4" x="38" y="60" width="4" height="20"></rect>
+										<path d="M21.7320508,75.6410162 L18.2679492,73.6410162 L28.2679492,56.3205081 L31.7320508,58.3205081 L21.7320508,75.6410162 Z" opacity="0.3"></path>
+										<path d="M6.35898385,61.7320508 L4.35898385,58.2679492 L21.6794919,48.2679492 L23.6794919,51.7320508 L6.35898385,61.7320508 Z" opacity="0.2"></path>
+										<path d="M1.77635684e-15,42 L1.04156876e-15,38 L20,38 L20,42 L1.77635684e-15,42 Z" opacity="0.15"></path>
+										<path d="M4.35898385,21.7320508 L6.35898385,18.2679492 L23.6794919,28.2679492 L21.6794919,31.7320508 L4.35898385,21.7320508 Z" opacity="0.1"></path>
+										<path d="M18.2679492,6.35898385 L21.7320508,4.35898385 L31.7320508,21.6794919 L28.2679492,23.6794919 L18.2679492,6.35898385 Z" opacity="0.05"></path>
+									</g>
 								</svg>
 							</span>
 						{{/if}}
-						<img src="{{ this.imgUrl }}" alt="{{ this.imgAlt }}" />
+						<img data-filename="{{ this.img }}" alt="{{ this.imgAlt }}" />
 					</span>
 					<div class="tile__details">
 						{{#if this.name}}
@@ -57,7 +73,9 @@
 						{{#if this.location}}
 						<div class="tile__location">
 							<img class="tile__location-map" src="icons/map.svg" />
-							<span class="tile__location-marker" style="left:{{ this.location-marker-x }}%; top:{{ this.location-marker-y }}%;"></span>
+							{{#if this.location-marker-x}}
+								<span class="tile__location-marker" style="left:{{ this.location-marker-x }}%; top:{{ this.location-marker-y }}%;"></span>
+							{{/if}}
 							<p class="tile__location-text"><span class="tile__text-holder">{{ this.location }}</span></p>
 						</div>
 						{{/if}}
@@ -67,7 +85,7 @@
 			{{/each}}
 
 		</div>
+		<button type="button" class="gallery__next"><img src="icons/arrow-right.svg" alt="Next" /></button>
+		<button type="button" class="gallery__prev is-inactive"><img src="icons/arrow-left.svg" alt="Previous" /></button>
 	</div>
-	<button type="button" class="gallery__next"><img src="icons/arrow-right.svg" alt="Next" /></button>
-	<button type="button" class="gallery__prev is-inactive"><img src="icons/arrow-left.svg" alt="Previous" /></button>
 </div>

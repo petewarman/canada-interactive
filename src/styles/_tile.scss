@@ -1,10 +1,15 @@
 @mixin tile-element-sizer($font-size, $leading) {
 	font-size: #{ $font-size }px;
-	line-height: ($font-size + ($leading * 2)) / $font-size;
+	line-height: #{ $font-size + ($leading * 2) }px;
 
 	.tile__text-holder {
-		padding: #{ $leading }px 0;
+		padding: #{ $leading * 1 }px 0;
 	}
+}
+
+@keyframes spin {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(-360deg); }
 }
 
 .tile {
@@ -29,6 +34,10 @@
 		z-index: 1;
 		cursor: auto;
 	}
+
+	&.is-growing {}
+
+	&.is-shrinking {}
 
 	.has-selected & {
 		transition-delay: $stage1Delay !important;
@@ -150,7 +159,7 @@
 	border-radius: 50%;
 	z-index: 2;
 	transition: all 0.3s;
-	opacity: 0;
+//	opacity: 0;
 	cursor: pointer;
 
 	svg {
@@ -160,18 +169,20 @@
 		margin: 20%;
 
 		.play,
-		.pause {
+		.pause,
+		.load {
 			fill: $white;
 		}
 	}
 
-	.pause {
+	.pause,
+	.load {
 		display: none;
 	}
 
-	.tile:not(.is-inactive):hover & {
-		opacity: 1;
-	}
+	// .tile:not(.is-inactive):hover & {
+	// 	opacity: 1;
+	// }
 
 	.is-selected & {
 		//opacity: 1;
@@ -195,6 +206,19 @@
 			display: block;
 		}
 	}
+
+	.is-loading & {
+		.play,
+		.pause {
+			display: none;
+		}
+
+		.load {
+			display: block;
+			transform-origin: center center;
+			animation: spin 1s linear infinite;
+		}
+	}
 }
 
 .tile__details {
@@ -202,8 +226,8 @@
 	left: 0;
 	top: 0;
 	padding: 10px;
-	width: calc(300% + 20px);
-	height: calc(300% + 20px);
+	width: 100%;
+	height: 100%;
 	overflow: hidden;
 	visibility: hidden;
 	opacity: 0;
@@ -351,7 +375,7 @@
 	width: 20px;
 	height: 20px;
 	opacity: 0;
-	transition: all 0.4s;
+	transition: transform 0.4s, opacity 0.4s;
 	transform: scale(0.5);
 	cursor: pointer;
 
@@ -361,15 +385,18 @@
 		transition-delay: 0.2s
 	}
 
-	.is-selected:hover & {
-		opacity: 0;
-		transform: scale(0.5);
+	.tile.is-selected & {
+		opacity: 1;
+		cursor: pointer;
+		transition-delay: $stage2Delay + $stage2Duration;
+		transition-duration: $stage2Duration;
+		transform: none;
+		background-image: url(../icons/collapse.svg);
+		background-color: rgba($canada-red, 0.75);
+		width: 40px;
+		height: 40px;
 	}
 
-	.is-inactive &,
-	.is-enlarged & {
-		display: none;
-	}
 }
 
 @media screen and (min-height: 521px) and (min-width: 521px) {

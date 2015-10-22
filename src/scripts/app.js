@@ -62,6 +62,7 @@ define([
 			this.$scrollLeftButton = $(this.options.scrollLeftButtonSelector);
 			this.$tileImgHolders = $(this.options.tileImgHolderSelector);
 			this.$tileCollapseButton = $(this.options.tileCollapseButtonSelector);
+			this.$resetButton = $(this.options.resetButtonSelector);
 		},
 
 		"addEventListeners": function (){
@@ -74,10 +75,42 @@ define([
 			this.$tileImgHolders.on('transitionend', _.debounce(this.onTileImgHolderTransitionend, 200))
 			this.$gallery.on('transitionend', this.onGalleryTransitionend);
 			this.$tileCollapseButton.on('click', this.onTileCollapseButtonClick);
+			this.$tileCollapseButton.on('keyup', this.onEleKeyup);
+			this.$tiles.on('keyup', this.onEleKeyup);
+			this.$tiles.on('focus', this.onTileFocus);
+			this.$tileCollapseButton.on('focus', this.onTileFocus);
+			this.$container.on('scroll', this.onContainerScroll);
+			this.$resetButton.on('click', this.onResetButtonClick);
 			//this.$container.on('mousewheel DOMMouseScroll', this.onGalleryMouseWheel);
 		},
 
 	/* Event Handlers */
+
+		"onContainerScroll": function() {
+			this.$container.scrollLeft(0);
+		},
+
+		"onTileFocus": function(e) {
+			var $target = $(e.currentTarget);
+
+			if($target.is(this.options.tileCollapseButtonSelector)) {
+				$target = $target.parents(this.options.tileSelector);
+			}
+
+			if(this.orientation === 'landscape') {
+
+				//scroll newly focussed items into view
+				//this.scrollToTile($target);
+
+			}
+		},
+
+		"onEleKeyup": function(e) {
+			if(e && (e.which === 13 || e.which === 32)) {
+				$(e.currentTarget).trigger('click');
+				e.stopPropagation();
+			}
+		},
 
 		"onGalleryMouseWheel": function(e) {
 			if(this.orientation === 'landscape') {
@@ -158,6 +191,7 @@ define([
 				this.scrollToTile($tile);
 				this.tryToPlayOrPauseTileVideo($tile);
 			} else if (!$tile.hasClass('is-inactive')) {
+				this.deselectTile(this.$tiles.filter('.is-selected'), true);
 				this.selectTile($tile);
 			}
 		},
@@ -166,21 +200,45 @@ define([
 			var $button = $(event.currentTarget);
 			var selectedClasses = [];
 
-			$button.toggleClass('is-selected');
+			if(this.$catButtons.not('.is-active').length === 0) {
+				//if all buttons are active - deactivate all
+				this.$catButtons.removeClass('is-active');
+			}
+
+			$button.toggleClass('is-active');
+
+			if(this.$catButtons.filter('.is-active').length === 0) {
+				//if no buttons are active - activate all
+				this.$catButtons.addClass('is-active');
+			}
 
 			this.$catButtons.each(function(ind, catButton){
 				var $catButton = $(catButton);
 
-				if ($catButton.hasClass('is-selected')) {
+				if ($catButton.hasClass('is-active')) {
 					selectedClasses.push('.' + $catButton.attr('data-tile-class'));
 				}
 			});
 
-			this.$tiles.removeClass('is-inactive');
+			//this.$tiles.removeClass('is-inactive');
 
 			if (selectedClasses.length > 0) {
-				this.$tiles.not(selectedClasses.join(', ')).addClass('is-inactive');
+				this.deactivateTiles(this.$tiles.not(selectedClasses.join(', ')));
+				this.activateTiles(this.$tiles.filter(selectedClasses.join(', ')));
+			} else {
+				this.activateTiles(this.$tiles);
 			}
+		},
+
+		"deactivateTiles": function($tiles) {
+			$tiles.addClass('is-inactive').removeAttr('tabindex');
+			$tiles.filter('.is-selected').find('.tile__expander, .tile__video-control').removeAttr('tabindex');
+		},
+
+		"activateTiles": function($tiles) {
+			$tiles.removeClass('is-inactive');
+			$tiles.not('.is-selected').attr('tabindex', 0);
+			$tiles.filter('.is-selected').find('.tile__expander, .tile__video-control').attr('tabindex', 0);
 		},
 
 		"onTileCollapseButtonClick": function(e) {
@@ -202,6 +260,15 @@ define([
 			}
 		},
 
+		"onResetButtonClick": function() {
+			this.$catButtons.addClass('is-active');
+			this.activateTiles(this.$tiles);
+			this.deselectTile(this.$tiles, true);
+			this.$gallery.packery('sortItems');
+			this.$gallery.packery();
+			this.scrollTo(0);
+		},
+
 	/* Gallery offset "scrolling" */
 
 		"setScrollButtonStates": function() {
@@ -209,14 +276,18 @@ define([
 			var offset = this.getCurrGalleryOffset();
 
 			if(offset >= bounds.upper) {
-				this.$interactiveContainer.focus();
+				if(this.$scrollLeftButton.is(':focus')) {
+					this.$scrollRightButton.focus();
+				}
 				this.$scrollLeftButton.addClass('is-inactive');
 			} else {
 				this.$scrollLeftButton.removeClass('is-inactive');
 			}
 
 			if (offset <= bounds.lower) {
-				this.$interactiveContainer.focus();
+				if(this.$scrollRightButton.is(':focus')) {
+					this.$scrollLeftButton.focus();
+				}
 				this.$scrollRightButton.addClass('is-inactive');
 			} else {
 				this.$scrollRightButton.removeClass('is-inactive');
@@ -265,7 +336,7 @@ define([
 			if (this.orientation === 'portrait') { return; }
 
 			var currOffset = this.getCurrGalleryOffset(),
-				decrement = this.containerWidth * 2/3;
+				decrement = this.selectedTileSize + this.options.gutter; //this.containerWidth * 2/3;
 
 			this.scrollTo(currOffset - decrement);
 		},
@@ -274,14 +345,14 @@ define([
 			if (this.orientation === 'portrait') { return; }
 
 			var currOffset = this.getCurrGalleryOffset(),
-				increment = this.containerWidth * 2/3;
+				increment = this.selectedTileSize + this.options.gutter; //this.containerWidth * 2/3;
 
 			this.scrollTo(currOffset + increment);
 		},
 
 		"scrollToTile": function($tile) {
 			if (this.orientation === 'landscape' && $tile.length > 0) {
-				this.scrollTo(($tile.position().left * -1) + ((this.$container.width() - $tile.width()) / 2));
+				this.scrollTo((($tile.position().left + this.options.gutter) * -1) + ((this.$container.width() - $tile.width()) / 2));
 			} else {
 				this._isScrolling = true;
 				$('html, body').stop(true, false).animate({'scrollTop': $tile.offset().top - ((this.winHeight - $tile.width()) / 2)}, 800, 'linear', this.onGalleryTransitionend);
@@ -292,6 +363,7 @@ define([
 
 		"determineOrientation": function() {
 			this.winHeight = $(window).height();
+			this.headerHeight = this.$header.height();
 			this.containerWidth = this.$container.width();
 
 			return (this.winHeight > this.containerWidth) ? 'portrait' : 'landscape';
@@ -301,7 +373,6 @@ define([
 			var options = {
 				"itemSelector": this.options.tileSelector,
 				"gutter": this.options.gutter,
-				"stamp": this.options.headerSelector,
 				isInitLayout: false
 			};
 
@@ -336,7 +407,7 @@ define([
 
 		"setDimensions": function() {
 			if (this.orientation === 'landscape') {
-				this.gallerySize = parseInt(this.winHeight - (this.options.gutter * 2), 10);
+				this.gallerySize = parseInt(this.winHeight - (this.options.gutter * 2) - this.headerHeight, 10);
 
 				if (this.options.landscapeMaxHeight) { 
 					this.gallerySize = Math.min(this.gallerySize, this.options.landscapeMaxHeight); 
@@ -357,19 +428,6 @@ define([
 
 			this.setGalleryDims();
 			this.setTileDims();
-			this.setHeaderDims();
-		},
-
-		"setHeaderDims": function() {
-			if (this.orientation === 'landscape') {
-				if (this.gallerySize > this.options.tilesPerAxisBreakPoint) {
-					this.$header.width(this.tileSize).height(this.bigTileSize);
-				} else {
-					this.$header.width(this.tileSize).height((this.tileSize * 2) + this.options.gutter);
-				}
-			} else {
-				this.$header.width('auto').height('auto');
-			}
 		},
 
 		"setGalleryDims": function() {
@@ -406,21 +464,84 @@ define([
 			return parseInt((gallerySize - (gutter * (tilesPerAxis-1))) * (1 / tilesPerAxis), 10);
 		},
 
-		"setTileWidth": function($tile, width) {
-			$tile.width(width).height(width);
-			$tile.find(this.options.tileImgHolderSelector).width(width).height(width);
+		"setTileWidth": function($tiles, width) {
+			var self = this;
+
+			$tiles.each(function(ind, tile){
+				var $tile = $(tile),
+					$tileImg = $tile.find('img[data-filename]'),
+					$tileVid = $tile.find('video'),
+					imgFilename = $tileImg.data('filename'),
+					dpr = window.devicePixelRatio || 1,
+					imgSize = self.selectMediaSize(width, self.options.assetSizes.images), //[1024, 840, 768, 640, 480, 320, 240, 160, 100]
+					vidSize = self.selectMediaSize(width * dpr, self.options.assetSizes.videos), //[1080]
+					imgSrc = ['images', imgSize, imgFilename].join('/'),
+					vidFilename,
+					vidSrc;
+
+				$tileImg.attr('src', imgSrc);
+				if(imgSrc) {
+					$tileImg.attr('srcset', self.createSrcset(imgSrc, [1, 2]) );
+				}
+
+				if($tileVid.length > 0) {
+					vidFilename = $tileVid.data('filename');
+					vidSrc = ['videos', vidSize, vidFilename].join('/');
+
+					$tileVid.attr('poster', imgSrc).attr('src', vidSrc);
+				}
+			})
+			.width(width).height(width)
+			.find(this.options.tileImgHolderSelector).width(width).height(width);
+		},
+
+		"createSrcset": function(baseSrc, pxDensities) {
+			var srcsets = [],
+				i,
+				src;
+
+			for(i=0; i<pxDensities.length; i++) {
+				if(pxDensities[i] !== 1) {
+					src = baseSrc.slice(0, -4) + '@' + pxDensities[i] + 'x' + baseSrc.slice(-4) + ' ' + pxDensities[i] + 'x';
+				} else {
+					src = baseSrc + ' 1x';
+				}
+				srcsets.push(src);
+			}
+
+			return srcsets.join(', ');
+		},
+
+		"selectMediaSize": function(tileSize, mediaSizes) {
+			mediaSizes.sort(function(a,b) {
+				return a - b;
+			});
+
+			return _.find(mediaSizes, function(mediaSize){
+				if(mediaSize > tileSize) {
+					return true;
+				}
+			}) || mediaSizes[mediaSizes.length -1];
+
 		},
 
 	/* tile selection/deselection */
 
-		"deselectTile": function($tiles) {
+		"deselectTile": function($tiles, noFocusTransfer) {
 			var self = this;
 
 			if ($tiles.length > 0) {
 
+				$tiles.removeClass('is-row-1 is-row-2 is-row-3 is-col-1 is-col-2 is-col-3');
+
+				if (this.orientation === 'landscape') {
+					$tiles.addClass('is-row-1');
+				} else {
+					$tiles.addClass('is-col-1');
+				}
+
 				this.tryToPauseTileVideo($tiles);
 				this.$gallery.removeClass('has-selected');
-
 				$tiles.each(function(i, tile){
 					var $tile = $(tile);
 
@@ -433,8 +554,12 @@ define([
 					}
 				});
 
-				this.$gallery.packery('sortItems');
+				//this.$gallery.packery('sortItems');
 				this.$gallery.packery();
+				$tiles.find('.tile__expander, .tile__video-control').removeAttr('tabindex');
+				if(!noFocusTransfer) {
+					$tiles.attr('tabindex', 0).trigger('focus');
+				}
 
 			}
 		},
@@ -445,6 +570,8 @@ define([
 				tilePos = $tile.position();
 
 			this.$gallery.addClass('has-selected');
+			$tile.removeAttr('tabindex').find('.tile__expander').attr('tabindex', 0).trigger('focus');
+			$tile.find('.tile__video-control').attr('tabindex', 0);
 			$tile.addClass('is-selected').addClass('is-enlarged');
 			$tile.removeClass('is-row-1 is-row-2 is-row-3 is-col-1 is-col-2 is-col-3');
 
@@ -501,26 +628,54 @@ define([
 
 		},
 
+		videoEvents: 'readystatechange loadeddata loadedmetadata canplay playing play canplaythrough stalled suspend waiting durationchange emptied',
+
 		"tryToPlayTileVideo": function($tiles) {
+			var self = this;
+
 			if($tiles.length > 0) {
 
 				$tiles.each(function(i, tile){
 					var $tile = $(tile),
-						$video = $tile.find('video');
+						$video = $tile.find('video'),
+						video;
 
-					if($video.length > 0) { 
-						$video.get(0).play();
+					if($video.length > 0) {
+						video = $video.get(0);
 						$tile.addClass('is-playing');
-						$video.one('pause ended', function() {
-							$tile.removeClass('is-playing');
-						});
+						self.loadOrPlayVideo(video);
+						$video.on(self.videoEvents, self.onVideoReadyStateChange);
 					}
 
 				});
 			}
 		},
 
+		"loadOrPlayVideo": function(video) {
+			var $video = $(video),
+				$tile = $video.parents(this.options.tileSelector);
+
+			if(!$tile.hasClass('is-playing')) { return; }
+
+			if(video.readyState === 4) {
+				video.play();
+				$tile.removeClass('is-loading');
+				$video.one('pause ended', function() {
+					$tile.removeClass('is-playing');
+				});
+			} else {
+				$tile.addClass('is-loading');
+			}
+		},
+
+		"onVideoReadyStateChange": function(e) {
+			console.log(e.type);
+			this.loadOrPlayVideo(e.currentTarget);
+		},
+
 		"tryToPauseTileVideo": function($tiles) {
+			var self = this;
+
 			if ($tiles.length > 0) {
 
 				$tiles.each(function(i, tile){
@@ -529,6 +684,8 @@ define([
 
 					if($video.length > 0) { 
 						$video.get(0).pause();
+						$tile.removeClass('is-playing').removeClass('is-loading');
+						$video.off(self.videoEvents, self.onVideoReadyStateChange);
 					}
 
 				});
@@ -541,7 +698,10 @@ define([
 		app,
 		'init',
 		'onTileClick',
+		'onTileFocus',
+		'onEleKeyup',
 		'onResize',
+		'onContainerScroll',
 		'onLayoutComplete',
 		'onCategoryButtonClick',
 		'scrollRight',
@@ -554,7 +714,12 @@ define([
 		'setScrollButtonStates',
 		'checkGalleryOffset',
 		'onGalleryMouseWheel',
-		'onTileCollapseButtonClick'
+		'onTileCollapseButtonClick',
+		'deactivateTiles',
+		'activateTiles',
+		'onResetButtonClick',
+		'loadOrPlayVideo',
+		'onVideoReadyStateChange'
 	);
 
 	return app;
