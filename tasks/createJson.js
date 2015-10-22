@@ -2,52 +2,60 @@ var gulp = require('gulp');
 var fs = require('fs');
 var env = require('jsdom').env
 var request = require('request');
-var spreadsheetJsonUrl = 'https://spreadsheets.google.com/feeds/list/1HZUxbXVMdzPHRS-UrgOQP6yILPcUkTWAmR0nswDqxBw/od6/public/basic?alt=json';
-var spreadsheetUrl = 'https://docs.google.com/spreadsheets/d/1HZUxbXVMdzPHRS-UrgOQP6yILPcUkTWAmR0nswDqxBw/pubhtml';
+var settings = require('../settings.js');
+var spreadsheetUrl = settings.spreadsheetUrl;
+//'https://docs.google.com/spreadsheets/d/1HZUxbXVMdzPHRS-UrgOQP6yILPcUkTWAmR0nswDqxBw/pubhtml';
 
 var base = {
-	"headerTitle": "The Best<br /> of Canada",
-	"headerDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.<br /><br />Select categories",
-	"categories": [
-		{
-			"id": 1,
-			"text": "best to see",
-			"icon": "eye"
-		},
-		{
-			"id": 2,
-			"text": "best to Eat",
-			"icon": "cutlery"
-		},
-		{
-			"id": 3,
-			"text": "best to Do",
-			"icon": "walk"
-		}
-	]
+	"assetSizes": settings.assetSizes
 };
-
 
 function parseResponse(data) {
 
 	var tiles = [];
+	var cats = [];
 
 	env(data, function (errors, window) {
 		var $ = require('jquery')(window);
-		var $rows = $(data).find('table tbody tr');
-		for (var i = 0; i < $rows.length; i++) {
+		var $tileRows = $(data).find('table:first tbody tr');
+		var $catRows = $(data).find('table:eq(1) tbody tr');
+		for (var i = 0; i < $tileRows.length; i++) {
 			if(i > 1) {
-				tiles.push( formatData($rows.eq(i).find('td')) );
+				var tile = formatTileData($tileRows.eq(i).find('td'));
+				if(tile.img && tile.categoryId) {
+					tiles.push(tile);
+				}
 			}
 		}
-		tiles[1].isBig = true;
+
+		for (var i = 0; i < $catRows.length; i++) {
+			if(i > 0) {
+				cats.push( formatCatData($catRows.eq(i).find('td')) );
+			}
+		}
+
+		//make first tile big
+		tiles[0].isBig = true;
+
 		base.tiles = tiles;
+		base.categories = cats;
 
 		fs.writeFileSync('./src/data/data.json', JSON.stringify(base));
 	});
 }
 
-function formatData($cells) {
+function formatCatData($cells) {
+	var obj = {};
+
+	if($cells.eq(0).text()) { obj.id = $cells.eq(0).text(); }
+	if($cells.eq(1).text()) { obj.text = $cells.eq(1).text(); }
+	if($cells.eq(2).text()) { obj.icon = $cells.eq(2).text(); }
+
+	return obj;
+
+}
+
+function formatTileData($cells) {
 	var obj = {};
 
 	if($cells.eq(0).text()) { obj.name = $cells.eq(0).text(); }
@@ -74,9 +82,9 @@ function formatData($cells) {
 	if($cells.eq(8).text()) { obj['location-marker-x'] = $cells.eq(8).text(); }
 	if($cells.eq(9).text()) { obj['location-marker-y'] = $cells.eq(9).text(); }
 	if($cells.eq(10).text()) { obj.categoryId = $cells.eq(10).text(); }
-	if($cells.eq(11).text()) { obj.imgUrl = 'images/' + $cells.eq(11).text(); }
+	if($cells.eq(11).text()) { obj.img = $cells.eq(11).text(); }
 	if($cells.eq(12).text()) { obj.imgAlt = $cells.eq(12).text(); }
-	if($cells.eq(13).text()) { obj.videoUrl = 'videos/' + $cells.eq(13).text(); }
+	if($cells.eq(13).text()) { obj.video = $cells.eq(13).text(); }
 
 	return obj;
 }
