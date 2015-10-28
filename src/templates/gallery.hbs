@@ -1,7 +1,7 @@
-<div class="interactive-container" tabindex="0">
+<div class="interactive-container grid-gallery" tabindex="0" data-root="{{rootPath}}">
 		<header class="header">
 			<button type="button" class="header__reset header__button">
-				<span class="icon"><img src="icons/reset.svg" /></span>
+				<span class="icon"><img src="{{ rootPath }}icons/reset.svg" /></span>
 				<span class="text">reset</span>
 			</button>
 			<ul class="header__category-list">
@@ -9,7 +9,7 @@
 				<li class="header__category-item">
 					<button data-tile-class="cat-{{ this.id }}" type="button" class="header__button header__category-button header__category-button--{{ this.id }} is-active">
 						<span class="icon">
-							<img src="icons/{{ this.icon }}.svg" />
+							<img src="{{ ../rootPath }}icons/{{ this.icon }}.svg" />
 						</span>
 						<span class="text">{{ this.text }}</span>
 					</button>
@@ -24,9 +24,7 @@
 				<div class="tile tile-{{ @index }} cat-{{ this.categoryId }} {{#if this.isBig}}tile--big{{/if}}" tabindex="0">
 					<span class="tile__img-holder">
 						{{#if this.video }}
-							<video data-filename="{{ this.video }}" src="" loop poster="{{ this.img }}" webkit-playsinline>
-								{{ this.img }}
-							</video>
+							<video data-filename="{{ this.video }}" src="" loop webkit-playsinline>{{ this.imgAlt }}</video>
 							<span class="tile__video-control">
 								<svg viewBox="0 0 80 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 									<polygon class="play" points="25 0 70 40 25 80 "></polygon>
@@ -61,23 +59,22 @@
 							<p class="tile__date"><span class="tile__text-holder">{{ this.date }}</span></p>
 						{{/if}}
 						{{#if this.description}}
-						<p class="tile__description"><span class="tile__text-holder">{{ this.description }}</span></p>
+							<p class="tile__description"><span class="tile__text-holder">{{ this.description }}</span></p>
 						{{/if}}
 						{{#if this.links}}
-						<ul class="tile__links">
-							{{#each this.links}}
-							<li class="tile__link-item"><a class="tile__link tile__text-holder" href="{{ this.url }}">{{ this.text }}</a></li>
-							{{/each}}
-						</ul>
+							<ul class="tile__links">
+								{{#each this.links}}
+								<li class="tile__link-item"><a class="tile__link tile__text-holder" href="{{ this.url }}">{{ this.text }}</a></li>
+								{{/each}}
+							</ul>
 						{{/if}}
 						{{#if this.location}}
-						<div class="tile__location">
-							<img class="tile__location-map" src="icons/map.svg" />
-							{{#if this.location-marker-x}}
-								<span class="tile__location-marker" style="left:{{ this.location-marker-x }}%; top:{{ this.location-marker-y }}%;"></span>
-							{{/if}}
-							<p class="tile__location-text"><span class="tile__text-holder">{{ this.location }}</span></p>
-						</div>
+							<div class="tile__location">
+								{{#if this.location-marker-x}}
+									<span class="tile__location-marker" style="left:{{ this.location-marker-x }}%; top:{{ this.location-marker-y }}%;"></span>
+								{{/if}}
+								<p class="tile__location-text"><span class="tile__text-holder">{{ this.location }}</span></p>
+							</div>
 						{{/if}}
 					</div>
 					<span class="tile__expander"></span>
@@ -85,7 +82,7 @@
 			{{/each}}
 
 		</div>
-		<button type="button" class="gallery__next"><img src="icons/arrow-right.svg" alt="Next" /></button>
-		<button type="button" class="gallery__prev is-inactive"><img src="icons/arrow-left.svg" alt="Previous" /></button>
+		<button type="button" class="gallery__next"><img src="{{ rootPath }}icons/arrow-right.svg" alt="Next" /></button>
+		<button type="button" class="gallery__prev is-inactive"><img src="{{ rootPath }}icons/arrow-left.svg" alt="Previous" /></button>
 	</div>
 </div>

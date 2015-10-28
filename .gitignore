@@ -1,6 +1,7 @@
 .sass-cache
 node_modules
-dist
+local-dist
+remote-dist
 src/vendor
 src/styles/main.css
 src/images

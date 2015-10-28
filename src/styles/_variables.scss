@@ -17,3 +17,17 @@ $stage2Duration: 0.3s;
 $stage2Delay: 0.3s;
 $stage1Ease: ease-out;
 $stage2Ease: ease-out;
+
+//tile change selection transitions
+$change-shrink-duration: 0.3s;
+$change-move-duration: 0.3s;
+$change-grow-duration: 0.3s;
+
+$change-shrink-delay: 0s;
+$change-move-delay: $change-shrink-duration;
+$change-grow-delay: $change-shrink-duration + $change-move-duration;
+
+$change-ease: ease-out;
+
+$vid-control-size: 40px;
+$vid-control-size-big: 100px;

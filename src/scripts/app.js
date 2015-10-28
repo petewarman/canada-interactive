@@ -52,17 +52,17 @@ define([
 	/* Set Up */
 
 		"getElementRefs": function() {
-			this.$tiles = $(this.options.tileSelector);
-			this.$interactiveContainer = $(this.options.interactiveContainerSelector);
-			this.$gallery = $(this.options.gallerySelector);
-			this.$container = $(this.options.containerSelector);
-			this.$header = $(this.options.headerSelector);
-			this.$catButtons = $(this.options.catButtonSelector);
-			this.$scrollRightButton = $(this.options.scrollRightButtonSelector);
-			this.$scrollLeftButton = $(this.options.scrollLeftButtonSelector);
-			this.$tileImgHolders = $(this.options.tileImgHolderSelector);
-			this.$tileCollapseButton = $(this.options.tileCollapseButtonSelector);
-			this.$resetButton = $(this.options.resetButtonSelector);
+			this.$tiles = $(this.options.tileSelector, this.options.interactiveEl);
+			this.$interactiveContainer = $(this.options.interactiveContainerSelector, this.options.interactiveEl);
+			this.$gallery = $(this.options.gallerySelector, this.options.interactiveEl);
+			this.$container = $(this.options.containerSelector, this.options.interactiveEl);
+			this.$header = $(this.options.headerSelector, this.options.interactiveEl);
+			this.$catButtons = $(this.options.catButtonSelector, this.options.interactiveEl);
+			this.$scrollRightButton = $(this.options.scrollRightButtonSelector, this.options.interactiveEl);
+			this.$scrollLeftButton = $(this.options.scrollLeftButtonSelector, this.options.interactiveEl);
+			this.$tileImgHolders = $(this.options.tileImgHolderSelector, this.options.interactiveEl);
+			this.$tileCollapseButton = $(this.options.tileCollapseButtonSelector, this.options.interactiveEl);
+			this.$resetButton = $(this.options.resetButtonSelector, this.options.interactiveEl);
 		},
 
 		"addEventListeners": function (){
@@ -81,10 +81,145 @@ define([
 			this.$tileCollapseButton.on('focus', this.onTileFocus);
 			this.$container.on('scroll', this.onContainerScroll);
 			this.$resetButton.on('click', this.onResetButtonClick);
+			this.$container.on('touchstart', this.onTouchStart);
+			this.$container.on('touchmove', this.onTouchMove);
+			this.$container.on('touchend', this.onTouchEnd);
+			this.$container.on('touchcancel', this.onTouchCancel);
+
+
 			//this.$container.on('mousewheel DOMMouseScroll', this.onGalleryMouseWheel);
 		},
 
 	/* Event Handlers */
+
+		"cancelDrag": function() {
+			this.$container.removeClass('is-dragging');
+			if(this._momentum) {
+				delete this._momentum;
+			}
+		},
+
+		"onTouchStart": function(event) {
+			if(this._momentum) {
+				delete this._momentum;
+			}
+
+			if(this.orientation === 'landscape') {
+				this._isTouching = true;
+				this._initialTouch = {
+					'clientX': event.originalEvent.touches[0].clientX,
+					'clientY': event.originalEvent.touches[0].clientY,
+					'time': Date.now()
+				};
+				this._initialOffset = this.getCurrGalleryOffset();
+				this._touchList = [];
+				this.$container.addClass('is-dragging');
+			}
+		},
+
+		"onTouchMove": function(event) {
+			var touch,
+				prevTouch,
+				xDiffFromInitial,
+				yDiffFromInitial,
+				xDiffFromPrevious,
+				offset;
+
+			if(this.orientation === 'landscape') {
+				touch = event.originalEvent.touches[0];
+				xDiffFromInitial = this._initialTouch.clientX - touch.clientX;
+				yDiffFromInitial = this._initialTouch.clientY - touch.clientY;
+				prevTouch = (this._touchList.length > 0) ? this._touchList[this._touchList.length - 1] : this._initialTouch;
+				xDiffFromPrevious = prevTouch.clientX - touch.clientX;
+
+				if(!this._isTouching) {
+					this.onTouchStart(event);
+					return;
+				}
+
+				//dont track micro movements
+				if(Math.abs(xDiffFromPrevious) > 2) {
+					this._touchList.push({
+						'clientX': touch.clientX,
+						'clientY': touch.clientY,
+						'time': Date.now()
+					});
+				}
+
+				//if movement is primarily horizontal prevent default vertical scroll
+				if(Math.abs(xDiffFromInitial) > Math.abs(yDiffFromInitial)) {
+					event.preventDefault();
+					this.scrollTo(this._initialOffset - xDiffFromInitial);
+				}
+			}
+		},
+
+		"onTouchEnd": function(event) {
+			var releaseVelocity;
+
+			this._isTouching = false;
+
+			if(this.orientation === 'landscape') {
+				if(this._touchList.length > 2) {
+					releaseVelocity = this.calculateReleaseVelocity();
+
+					if(Math.abs(releaseVelocity) > 0.001) {
+						this.momentumScroll(releaseVelocity);
+					} else {
+						this.cancelDrag();
+						this.onGalleryTransitionend();
+					}
+				}
+			} else {
+				this.cancelDrag();
+				this.onGalleryTransitionend();
+			}
+		},
+
+		"onTouchCancel": function(event) {
+			this._isTouching = false;
+			this.cancelDrag();
+			this.onGalleryTransitionend();
+		},
+
+		"calculateReleaseVelocity": function() {
+			//get last two touches from touchList
+			var touch1 = this._touchList[this._touchList.length - 2],
+				touch2 = this._touchList[this._touchList.length - 1],
+				diffX = touch1.clientX - touch2.clientX,
+				diffT = touch2.time - touch1.time;
+
+			//return release velocity in pixels per milisecond.
+			return diffX / diffT;
+		},
+
+		"momentumScroll": function(releaseVelocity) {
+			this._momentum = {};
+			this._momentum.scrollDiff = 200 * releaseVelocity;
+			this._momentum.targetOffset = Math.round(this.getCurrGalleryOffset() - this._momentum.scrollDiff); 
+			this._momentum.initialTimestamp = Date.now();
+			this._momentum.timeConstant = 325;
+			requestAnimationFrame(this.momentumScrollStep);
+		},
+
+		"momentumScrollStep": function() {
+			var timeElapsed, 
+				delta;
+
+			if (this._momentum) {
+				timeElapsed = Date.now() - this._momentum.initialTimestamp;
+				delta = this._momentum.scrollDiff * Math.exp(-timeElapsed / this._momentum.timeConstant);
+
+				if (delta > 0.5 || delta < -0.5) {
+					this.scrollTo(this._momentum.targetOffset + delta);
+					requestAnimationFrame(this.momentumScrollStep);
+				} else {
+					this.scrollTo(this._momentum.targetOffset);
+					this.cancelDrag();
+					this.onGalleryTransitionend();
+				}
+			}
+		},
 
 		"onContainerScroll": function() {
 			this.$container.scrollLeft(0);
@@ -146,6 +281,9 @@ define([
 		"onTileImgHolderTransitionend": function (e) {
 			if($(e.target).is(this.options.tileImgHolderSelector)) {
 				this.$tiles.not('.is-selected').removeClass('is-enlarged');
+				if($(e.target).parent(this.options.tileSelector).hasClass('is-selected')) {
+					this.$gallery.removeClass('change-selection');
+				}
 				if(!this._isScrolling) {
 					this.checkGalleryOffset();
 					this.setScrollButtonStates();
@@ -183,7 +321,8 @@ define([
 		},
 
 		"onTileClick": function(event) {
-			var $tile = $(event.currentTarget);
+			var $tile = $(event.currentTarget),
+				$selectedTile = this.$tiles.filter('.is-selected');
 
 			this.tryToPauseTileVideo( this.$tiles.not($tile).filter('.is-selected') );
 
@@ -191,8 +330,20 @@ define([
 				this.scrollToTile($tile);
 				this.tryToPlayOrPauseTileVideo($tile);
 			} else if (!$tile.hasClass('is-inactive')) {
-				this.deselectTile(this.$tiles.filter('.is-selected'), true);
-				this.selectTile($tile);
+				if($selectedTile.length > 0) {
+
+					this.$gallery.addClass('change-selection');
+
+					if(
+						(this.orientation === 'landscape' && $selectedTile.position().left > $tile.position().left) ||
+						(this.orientation === 'portrait' && $selectedTile.position().top > $tile.position().top)
+					) {
+						this.deselectTile($selectedTile, true, {'x':'right', 'y': 'bottom'});
+					} else {
+						this.deselectTile($selectedTile, true, {'x':'left', 'y': 'top'});
+					}
+				}
+				this.selectTile($tile, $selectedTile);
 			}
 		},
 
@@ -232,13 +383,13 @@ define([
 
 		"deactivateTiles": function($tiles) {
 			$tiles.addClass('is-inactive').removeAttr('tabindex');
-			$tiles.filter('.is-selected').find('.tile__expander, .tile__video-control').removeAttr('tabindex');
+			$tiles.filter('.is-selected').find([this.options.tileCollapseButtonSelector, this.options.tileVideoControlSelector].join(', ')).removeAttr('tabindex');
 		},
 
 		"activateTiles": function($tiles) {
 			$tiles.removeClass('is-inactive');
 			$tiles.not('.is-selected').attr('tabindex', 0);
-			$tiles.filter('.is-selected').find('.tile__expander, .tile__video-control').attr('tabindex', 0);
+			$tiles.filter('.is-selected').find([this.options.tileCollapseButtonSelector, this.options.tileVideoControlSelector].join(', ')).attr('tabindex', 0);
 		},
 
 		"onTileCollapseButtonClick": function(e) {
@@ -266,7 +417,7 @@ define([
 			this.deselectTile(this.$tiles, true);
 			this.$gallery.packery('sortItems');
 			this.$gallery.packery();
-			this.scrollTo(0);
+			this.scrollToTile(this.$tiles.filter(':first'));
 		},
 
 	/* Gallery offset "scrolling" */
@@ -335,6 +486,8 @@ define([
 		"scrollRight": function() {
 			if (this.orientation === 'portrait') { return; }
 
+			this.cancelDrag();
+
 			var currOffset = this.getCurrGalleryOffset(),
 				decrement = this.selectedTileSize + this.options.gutter; //this.containerWidth * 2/3;
 
@@ -344,6 +497,8 @@ define([
 		"scrollLeft": function() {
 			if (this.orientation === 'portrait') { return; }
 
+			this.cancelDrag();
+
 			var currOffset = this.getCurrGalleryOffset(),
 				increment = this.selectedTileSize + this.options.gutter; //this.containerWidth * 2/3;
 
@@ -351,6 +506,8 @@ define([
 		},
 
 		"scrollToTile": function($tile) {
+			this.cancelDrag();
+
 			if (this.orientation === 'landscape' && $tile.length > 0) {
 				this.scrollTo((($tile.position().left + this.options.gutter) * -1) + ((this.$container.width() - $tile.width()) / 2));
 			} else {
@@ -475,7 +632,7 @@ define([
 					dpr = window.devicePixelRatio || 1,
 					imgSize = self.selectMediaSize(width, self.options.assetSizes.images), //[1024, 840, 768, 640, 480, 320, 240, 160, 100]
 					vidSize = self.selectMediaSize(width * dpr, self.options.assetSizes.videos), //[1080]
-					imgSrc = ['images', imgSize, imgFilename].join('/'),
+					imgSrc = [self.options.rootPath + 'images', imgSize, imgFilename].join('/'),
 					vidFilename,
 					vidSrc;
 
@@ -486,7 +643,7 @@ define([
 
 				if($tileVid.length > 0) {
 					vidFilename = $tileVid.data('filename');
-					vidSrc = ['videos', vidSize, vidFilename].join('/');
+					vidSrc = [self.options.rootPath + 'videos', vidSize, vidFilename].join('/');
 
 					$tileVid.attr('poster', imgSrc).attr('src', vidSrc);
 				}
@@ -527,17 +684,15 @@ define([
 
 	/* tile selection/deselection */
 
-		"deselectTile": function($tiles, noFocusTransfer) {
+		"deselectTile": function($tiles, noFocusTransfer, shrinkOrigin) {
 			var self = this;
 
 			if ($tiles.length > 0) {
 
-				$tiles.removeClass('is-row-1 is-row-2 is-row-3 is-col-1 is-col-2 is-col-3');
+				$tiles.removeClass('is-x-left is-x-center is-x-right is-y-top is-y-center is-y-bottom');
 
-				if (this.orientation === 'landscape') {
-					$tiles.addClass('is-row-1');
-				} else {
-					$tiles.addClass('is-col-1');
+				if (shrinkOrigin) {
+					$tiles.addClass('is-x-' + shrinkOrigin.x + ' is-y-' + shrinkOrigin.y);
 				}
 
 				this.tryToPauseTileVideo($tiles);
@@ -555,8 +710,10 @@ define([
 				});
 
 				//this.$gallery.packery('sortItems');
-				this.$gallery.packery();
-				$tiles.find('.tile__expander, .tile__video-control').removeAttr('tabindex');
+				if(!this.$gallery.hasClass('change-selection')) {
+					this.$gallery.packery();
+				}
+				$tiles.find([this.options.tileCollapseButtonSelector, this.options.tileVideoControlSelector].join(', ')).removeAttr('tabindex');
 				if(!noFocusTransfer) {
 					$tiles.attr('tabindex', 0).trigger('focus');
 				}
@@ -564,44 +721,96 @@ define([
 			}
 		},
 
-		"selectTile": function($tile) {
+		"selectTile": function($tile, $prevTile) {
 			var currColumn,
 				targetOffset,
-				tilePos = $tile.position();
+				tilePos = $tile.position(),
+				expandOrigin = this.getTileExpansionOrigin($tile, $prevTile),
+				fitX = 0,
+				fitY = 0;
 
 			this.$gallery.addClass('has-selected');
-			$tile.removeAttr('tabindex').find('.tile__expander').attr('tabindex', 0).trigger('focus');
-			$tile.find('.tile__video-control').attr('tabindex', 0);
+			$tile.removeAttr('tabindex').find(this.options.tileCollapseButtonSelector).attr('tabindex', 0).trigger('focus');
+			$tile.find(this.options.tileVideoControlSelector).attr('tabindex', 0);
 			$tile.addClass('is-selected').addClass('is-enlarged');
-			$tile.removeClass('is-row-1 is-row-2 is-row-3 is-col-1 is-col-2 is-col-3');
+
+			$tile.removeClass('is-x-left is-x-center is-x-right is-y-top is-y-center is-y-bottom');
+			$tile.addClass('is-x-' + expandOrigin.x + ' is-y-' + expandOrigin.y);
 
 			this.setTileWidth($tile, this.selectedTileSize);
 
 			if (this.orientation === 'landscape') {
-				if(tilePos.top === 0) {
-					$tile.addClass('is-row-1');
-				} else if(tilePos.top === this.tileSize + this.options.gutter) {
-					$tile.addClass('is-row-2');
+
+				if(expandOrigin.x === 'left') {
+					fitX = tilePos.left;
+				} else if(expandOrigin.x === 'center') {
+					fitX = tilePos.left - (this.tileSize + this.options.gutter);
 				} else {
-					$tile.addClass('is-row-3');
+					fitX = (this.tilesPerAxis === 3) ? tilePos.left - (this.tileSize + this.options.gutter) * 2 : tilePos.left - (this.tileSize + this.options.gutter);
 				}
 
-				this.$gallery.packery('fit', $tile[0], tilePos.left, 0);
+				fitX = Math.max(fitX, 0);
 
 			} else {
-				if(tilePos.left === 0) {
-					$tile.addClass('is-col-1');
-				} else if(tilePos.left === this.tileSize + this.options.gutter) {
-					$tile.addClass('is-col-2');
+
+				if(expandOrigin.y === 'top') {
+					fitY = tilePos.top;
+				} else if(expandOrigin.x === 'center') {
+					fitY = tilePos.top - (this.tileSize + this.options.gutter);
 				} else {
-					$tile.addClass('is-col-3');
+					fitY = (this.tilesPerAxis === 3) ? tilePos.top - (this.tileSize + this.options.gutter) * 2 : tilePos.top - (this.tileSize + this.options.gutter);
 				}
-				this.$gallery.packery('fit', $tile[0], 0);
+
+				fitY = Math.max(fitY, 0);
 			}
+
+			this.$gallery.packery('fit', $tile[0], fitX, fitY);
 			//this.$gallery.packery('sortItems');
-			this.$gallery.packery();
+			//this.$gallery.packery();
 			this.tryToPlayTileVideo($tile);
 			this.scrollToTile($tile);
+		},
+
+		"getTileExpansionOrigin": function($tile, $selectedTile) {
+			var tilePos = $tile.position(),
+				expandOrigin = {},
+				scrollCenter;
+
+			if (this.orientation === 'landscape') {
+
+				if(Math.abs(tilePos.top) < this.options.gutter) {
+					expandOrigin.y = 'top';
+				} else if(this.tilesPerAxis === 3 && tilePos.top - (this.tileSize + this.options.gutter) <= this.options.gutter) {
+					expandOrigin.y = 'center';
+				} else {
+					expandOrigin.y = 'bottom';
+				}
+
+				if($selectedTile && $selectedTile.length > 0 && $selectedTile.position().left < tilePos.left) {
+					expandOrigin.x = 'right';
+				} else {
+					expandOrigin.x = 'left';
+				}
+
+			} else {
+
+				if(Math.abs(tilePos.left) < this.options.gutter) {
+					expandOrigin.x = 'left';
+				} else if(this.tilesPerAxis === 3 && tilePos.left - (this.tileSize + this.options.gutter) <= this.options.gutter) {
+					expandOrigin.x = 'center';
+				} else {
+					expandOrigin.x = 'right';
+				}
+
+				if($selectedTile && $selectedTile.length > 0 && $selectedTile.position().top < tilePos.top) {
+					expandOrigin.y = 'bottom';
+				} else {
+					expandOrigin.y = 'top';
+				}
+
+			}
+
+			return expandOrigin;
 		},
 
 	/* Video controllers */
@@ -669,7 +878,6 @@ define([
 		},
 
 		"onVideoReadyStateChange": function(e) {
-			console.log(e.type);
 			this.loadOrPlayVideo(e.currentTarget);
 		},
 
@@ -719,7 +927,13 @@ define([
 		'activateTiles',
 		'onResetButtonClick',
 		'loadOrPlayVideo',
-		'onVideoReadyStateChange'
+		'onVideoReadyStateChange',
+		'onTouchStart',
+		'onTouchMove',
+		'onTouchEnd',
+		'onTouchCancel',
+		'momentumScroll',
+		'momentumScrollStep'
 	);
 
 	return app;

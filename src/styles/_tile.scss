@@ -28,26 +28,21 @@
 	}
 
 	&.is-enlarged {
-		&:not(.tile-0) {
-			transition: none !important;
-		}
 		z-index: 1;
 		cursor: auto;
 	}
-
-	&.is-growing {}
-
-	&.is-shrinking {}
-
-	.has-selected & {
-		transition-delay: $stage1Delay !important;
-		transition-duration: $stage1Duration !important;
-		transition-timing-function: $stage1Ease !important;
-	}
 }
 
-.tile-0.is-row-3.is-selected {
-	top: 0 !important;
+.has-selected .tile  {
+	transition-delay: $stage1Delay !important;
+	transition-duration: $stage1Duration !important;
+	transition-timing-function: $stage1Ease !important;
+}
+
+.change-selection .tile  {
+	transition-delay: $change-move-delay !important;
+	transition-duration: $change-move-duration !important;
+	transition-timing-function: $change-ease !important;
 }
 
 .tile__img-holder {
@@ -56,22 +51,6 @@
 	width: 100%;
 	left: 0;
 	top: 0;
-
-	.layout-complete & {
-		transition: width 0.4s 0s, height 0.4s 0s;
-		transform: translateZ(0);
-		-webkit-backface-visibility: hidden;
-
-		transition-delay: $stage1Delay;
-		transition-duration: $stage1Duration;
-		transition-timing-function: $stage1Ease;
-	}
-
-	.is-selected & {
-		transition-delay: $stage2Delay;
-		transition-duration: $stage2Duration;
-		transition-timing-function: $stage2Ease;
-	}
 
 	img {
 		display: block;
@@ -89,77 +68,99 @@
 		left: 0;
 		top: 0;
 	}
-
-	.is-selected & video {
-		display: block;
-	}
-
-	.tile:hover & img {
-		opacity: 0.3;
-		filter: grayscale(100%);
-	}
-
-	.is-enlarged:hover & img,
-	.is-inactive:hover & img {
-		opacity: 1;
-		filter: none;
-	}
-
-	.tile.is-playing & img {
-		opacity: 0;
-	}
-
-	.is-row-1 & {
-		top: 0;
-	}
-
-	.tiles-per-axis-2 .is-row-2 &,
-	.is-row-3 & {
-		top: auto;
-		bottom: 0;
-	}
-
-	.tiles-per-axis-3 .is-row-2 & {
-		top: 50%;
-		transform: translateY(-50%);
-	}
-
-	.is-col-1 & {
-		left: 0;
-	}
-
-	.tiles-per-axis-2 .is-col-2 &,
-	.is-col-3 & {
-		left: auto;
-		right: 0;
-	}
-
-	.tiles-per-axis-3 .is-col-2 & {
-		left: 50%;
-		transform: translateX(-50%);
-	}
-
-	.cat-1 & { background: $cat-1-color; }
-	.cat-2 & { background: $cat-2-color; }
-	.cat-3 & { background: $cat-3-color; }
-
 }
 
-.tile__video-control {
-	$size: 40px;
-	$size-big: 100px;
+.layout-complete .tile__img-holder {
+	transition: width 0.4s 0s, height 0.4s 0s;
+	transform: translateZ(0);
+	-webkit-backface-visibility: hidden;
 
+	transition-delay: $stage1Delay;
+	transition-duration: $stage1Duration;
+	transition-timing-function: $stage1Ease;
+}
+
+.is-selected .tile__img-holder {
+	transition-delay: $stage2Delay;
+	transition-duration: $stage2Duration;
+	transition-timing-function: $stage2Ease;
+}
+
+.change-selection .tile__img-holder {
+	transition-delay: $change-shrink-delay;
+	transition-duration: $change-shrink-duration;
+	transition-timing-function: $change-ease;
+}
+
+.change-selection .is-selected .tile__img-holder {
+	transition-delay: $change-grow-delay;
+	transition-duration: $change-grow-duration;
+}
+
+.is-selected .tile__img-holder video {
+	display: block;
+}
+
+.tile:hover .tile__img-holder img {
+	opacity: 0.3;
+	filter: grayscale(100%);
+}
+
+.is-enlarged:hover .tile__img-holder img,
+.is-inactive:hover .tile__img-holder img {
+	opacity: 1;
+	filter: none;
+}
+
+.tile.is-playing .tile__img-holder img {
+	opacity: 0;
+}
+
+.is-y-top .tile__img-holder {
+	top: 0;
+}
+
+.is-y-center .tile__img-holder {
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.is-y-bottom .tile__img-holder {
+	top: auto;
+	bottom: 0;
+}
+
+.is-x-left .tile__img-holder {
+	left: 0;
+}
+
+.is-x-center .tile__img-holder {
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.is-x-right .tile__img-holder {
+	left: auto;
+	right: 0;
+}
+
+.cat-1 .tile__img-holder { background: $cat-1-color; }
+.cat-2 .tile__img-holder { background: $cat-2-color; }
+.cat-3 .tile__img-holder { background: $cat-3-color; }
+
+
+
+.tile__video-control {
 	position: absolute;
 	left: 50%;
 	top: 50%;
-	width: $size;
-	height: $size;
-	margin: $size/(-2) 0 0 $size/(-2);
-	background: $canada-red;
+	width: $vid-control-size;
+	height: $vid-control-size;
+	margin: $vid-control-size/(-2) 0 0 $vid-control-size/(-2);
+	background: rgba($canada-red, 0.75);
 	border-radius: 50%;
 	z-index: 2;
 	transition: all 0.3s;
-//	opacity: 0;
 	cursor: pointer;
 
 	svg {
@@ -183,41 +184,41 @@
 	// .tile:not(.is-inactive):hover & {
 	// 	opacity: 1;
 	// }
+}
 
-	.is-selected & {
-		//opacity: 1;
-		width: $size-big;
-		height: $size-big;
-		margin: $size-big/(-2) 0 0 $size-big/(-2);
+.is-selected .tile__video-control {
+	//opacity: 1;
+	width: $vid-control-size-big;
+	height: $vid-control-size-big;
+	margin: $vid-control-size-big/(-2) 0 0 $vid-control-size-big/(-2);
+}
+
+.is-playing .tile__video-control {
+	width: $vid-control-size;
+	height: $vid-control-size;
+	left: 0;
+	top: 100%;
+	margin: (-10px - $vid-control-size) 0 0 10px;
+
+	.play {
+		display: none;
 	}
 
-	.is-playing & {
-		width: $size;
-		height: $size;
-		left: 0;
-		top: 100%;
-		margin: (-10px - $size) 0 0 10px;
+	.pause {
+		display: block;
+	}
+}
 
-		.play {
-			display: none;
-		}
-
-		.pause {
-			display: block;
-		}
+.is-loading .tile__video-control {
+	.play,
+	.pause {
+		display: none;
 	}
 
-	.is-loading & {
-		.play,
-		.pause {
-			display: none;
-		}
-
-		.load {
-			display: block;
-			transform-origin: center center;
-			animation: spin 1s linear infinite;
-		}
+	.load {
+		display: block;
+		transform-origin: center center;
+		animation: spin 1s linear infinite;
 	}
 }
 
@@ -234,59 +235,63 @@
 	transition: visibility 0s 0s, opacity 0s 0s;
 	box-sizing: border-box;
 
-	.is-selected & {
-		visibility: visible;
-		opacity: 1;
-		width: 100%;
-		height: auto;
-		max-height: 100%;
-		min-height: 170px;
-		transition: visibility 0s ($stage2Delay + $stage2Duration), opacity 0.3s ($stage2Delay + $stage2Duration);
-	}
+}
+
+.is-selected .tile__details {
+	visibility: visible;
+	opacity: 1;
+	width: 100%;
+	height: auto;
+	max-height: 100%;
+	min-height: 170px;
+	transition: visibility 0s ($stage2Delay + $stage2Duration), opacity 0.3s ($stage2Delay + $stage2Duration);
+}
+
+.change-selection .is-selected .tile__details {
+	transition: visibility 0s ($change-grow-delay + $change-grow-duration), opacity 0.3s ($change-grow-delay + $change-grow-duration);
 }
 
 .tile__text-holder {
 	display: inline;
-
-	.tile__title &,
-	.tile__date &,
-	.tile__location-text & {
-		background: rgba($canada-red, 0.75);
-		color: $white;
-		box-shadow: ($text-padding * -1) 0 0 rgba($canada-red, 0.75), $text-padding 0 0 rgba($canada-red, 0.75);
-	}
-
-	.cat-1 .tile__description &,
-	.cat-1 .tile__link-item & {
-		background: rgba($cat-1-color, 0.75);
-		box-shadow: ($text-padding * -1) 0 0 rgba($cat-1-color, 0.75), $text-padding 0 0 rgba($cat-1-color, 0.75);
-		color: $white;
-	}
-
-	.cat-2 .tile__description &,
-	.cat-2 .tile__link-item & {
-		background: rgba($cat-2-color, 0.75);
-		box-shadow: ($text-padding * -1) 0 0 rgba($cat-2-color, 0.75), $text-padding 0 0 rgba($cat-2-color, 0.75);
-		color: $white;
-	}
-
-	.cat-3 .tile__description &,
-	.cat-3 .tile__link-item & {
-		background: rgba($cat-3-color, 0.75);
-		box-shadow: ($text-padding * -1) 0 0 rgba($cat-3-color, 0.75), $text-padding 0 0 rgba($cat-3-color, 0.75);
-		color: $white;
-	}
 }
 
-.tile__title {
+.tile__title .tile__text-holder,
+.tile__date .tile__text-holder,
+.tile__location-text .tile__text-holder {
+	background: rgba($canada-red, 0.75);
+	color: $white;
+	box-shadow: ($text-padding * -1) 0 0 rgba($canada-red, 0.75), $text-padding 0 0 rgba($canada-red, 0.75);
+}
 
+.cat-1 .tile__description .tile__text-holder,
+.cat-1 .tile__link-item .tile__text-holder {
+	background: rgba($cat-1-color, 0.75);
+	box-shadow: ($text-padding * -1) 0 0 rgba($cat-1-color, 0.75), $text-padding 0 0 rgba($cat-1-color, 0.75);
+	color: $white;
+}
+
+.cat-2 .tile__description .tile__text-holder,
+.cat-2 .tile__link-item .tile__text-holder {
+	background: rgba($cat-2-color, 0.75);
+	box-shadow: ($text-padding * -1) 0 0 rgba($cat-2-color, 0.75), $text-padding 0 0 rgba($cat-2-color, 0.75);
+	color: $white;
+}
+
+.cat-3 .tile__description .tile__text-holder,
+.cat-3 .tile__link-item .tile__text-holder {
+	background: rgba($cat-3-color, 0.75);
+	box-shadow: ($text-padding * -1) 0 0 rgba($cat-3-color, 0.75), $text-padding 0 0 rgba($cat-3-color, 0.75);
+	color: $white;
+}
+
+
+.tile__title {
 	text-transform: uppercase;
 	max-width: 50%;
 	padding: 0 $text-padding;
 	margin: 10px 0 20px;
 	font-weight: bold;
 	@include tile-element-sizer(14, 2);
-
 }
 
 .tile__date {
@@ -308,6 +313,8 @@
 .tile__links {
 	max-width: 50%;
 	list-style: none;
+	margin: 0;
+	padding: 0;
 }
 
 .tile__link-item {
@@ -330,28 +337,23 @@
 	width: 100px;
 	height: 100px;
 	border-radius: 50%;
+	background: url(../icons/map.svg) center center no-repeat;
+	background-size: 75% auto;
 
-	.cat-1 & { background: $cat-1-color; }
-	.cat-2 & { background: $cat-2-color; }
-	.cat-3 & { background: $cat-3-color; }
 }
+
+.cat-1 .tile__location { background-color: rgba($cat-1-color, 0.75); }
+.cat-2 .tile__location { background-color: rgba($cat-2-color, 0.75); }
+.cat-3 .tile__location { background-color: rgba($cat-3-color, 0.75); }
 
 .tile__location-text {
 	text-transform: uppercase;
 	padding: 0 $text-padding;
+	margin: 0;
 	position: absolute;
 	top: 10%;
 	right: 65%;
 	@include tile-element-sizer(11, 2);
-}
-
-.tile__location-map {
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	transform: translate(-50%,-50%);
-	width: 75%;
-	opacity: 0.5;
 }
 
 .tile__location-marker {
@@ -378,25 +380,24 @@
 	transition: transform 0.4s, opacity 0.4s;
 	transform: scale(0.5);
 	cursor: pointer;
+}
 
-	.tile:hover & {
-		opacity: 1;
-		transform: none;
-		transition-delay: 0.2s
-	}
+.tile:hover .tile__expander {
+	opacity: 1;
+	transform: none;
+	transition-delay: 0.2s
+}
 
-	.tile.is-selected & {
-		opacity: 1;
-		cursor: pointer;
-		transition-delay: $stage2Delay + $stage2Duration;
-		transition-duration: $stage2Duration;
-		transform: none;
-		background-image: url(../icons/collapse.svg);
-		background-color: rgba($canada-red, 0.75);
-		width: 40px;
-		height: 40px;
-	}
-
+.tile.is-selected .tile__expander {
+	opacity: 1;
+	cursor: pointer;
+	transition-delay: $stage2Delay + $stage2Duration;
+	transition-duration: $stage2Duration;
+	transform: none;
+	background-image: url(../icons/collapse.svg);
+	background-color: rgba($canada-red, 0.75);
+	width: 40px;
+	height: 40px;
 }
 
 @media screen and (min-height: 521px) and (min-width: 521px) {

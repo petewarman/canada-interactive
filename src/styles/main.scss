@@ -1,5 +1,4 @@
-// bower:scss
-// endbower
+@import 'variables';
 
 $guss-webfonts-base-url: '//pasteup.guim.co.uk/fonts/';
 
@@ -16,79 +15,86 @@ $guss-webfonts-base-url: '//pasteup.guim.co.uk/fonts/';
 @include guss-webfonts('Guardian Agate Sans 1 Web');
 @include guss-typography-defaults;
 
-@import 'reset';
-@import 'variables';
-@import 'header';
-@import 'tile';
-
-body, html {
-	margin: 0;
-	padding: 0;
+.grid-gallery {
 	font-family: 'Guardian Agate Sans 1 Web', sans-serif;
-}
-
-button {
-	font-family: inherit;
-}
-
-.interactive-container {
 	position: relative;
-}
 
-.gallery-container {
-	transform: translateX(0);
-	margin: 0 auto;
-	overflow: hidden;
-}
+	@import 'reset';
+	@import 'header';
+	@import 'tile';
 
-.gallery {
-	border: $gutter solid #fff;
-	background: $white;
-	transition-property: transform;
-	transition-duration: $stage2Duration;
-	transition-delay: $stage2Delay;
-	transition-timing-function: $stage2Ease;
-
-	&.has-selected {
-		transition-duration: $stage1Duration;
-		transition-delay: $stage1Delay;
-		transition-timing-function: $stage1Ease;
+	button {
+		font-family: inherit;
 	}
-}
 
-.gallery__next,
-.gallery__prev {
-	$duration: 0.3s;
-
-	margin: 0;
-	padding: 10px;
-	border: 0;
-	background: $white;
-	position: absolute;
-	top: 50%;
-	transform: translateY(-50%);
-	width: 50px;
-	height: 50px;
-	transition: opacity $duration 0s, visibility 0s 0s;
-
-	&.is-inactive {
-		opacity: 0;
-		visibility: hidden;
-		transition: opacity $duration 0s, visibility 0s $duration;
+	.container {
+		transform: translateX(0);
+		margin: 0 auto;
+		overflow: hidden;
 	}
-}
 
-.gallery__next {
-	right: 0;
-}
+	.gallery-container {
+		position: relative;
+		overflow: hidden;
+	}
 
-.gallery__prev {
-	left: 0;
-}
+	.gallery {
+		border: $gutter solid #fff;
+		background: $white;
+		transition-property: transform;
+		transition-duration: $stage2Duration;
+		transition-delay: $stage2Delay;
+		transition-timing-function: $stage2Ease;
 
-.is-portrait {
+		&.has-selected {
+			transition-duration: $stage1Duration;
+			transition-delay: $stage1Delay;
+			transition-timing-function: $stage1Ease;
+		}
+
+		&.change-selection {
+		}
+
+		.is-dragging & {
+			transition: none;
+		}
+	}
+
 	.gallery__next,
 	.gallery__prev {
-		display: none;
+		$duration: 0.3s;
+
+		margin: 0;
+		padding: 10px;
+		border: 0;
+		background: $white;
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 50px;
+		height: 50px;
+		transition: opacity $duration 0s, visibility 0s 0s;
+
+		&.is-inactive {
+			opacity: 0;
+			visibility: hidden;
+			transition: opacity $duration 0s, visibility 0s $duration;
+		}
 	}
+
+	.gallery__next {
+		right: 0;
+	}
+
+	.gallery__prev {
+		left: 0;
+	}
+
+	.is-portrait {
+		.gallery__next,
+		.gallery__prev {
+			display: none;
+		}
+	}
+
 }

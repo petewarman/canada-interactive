@@ -3,12 +3,7 @@ define( [], function () {
   'use strict';
 
   // Get paths for assets (css + js)
-  var rootPath = isLocal() ? "" : "{{remote-root}}";
-
-  function isLocal() {
-    //return window.location.hostname === 'localhost'; 
-    return true;
-  }
+  var rootPath = "{{rootPath}}";
 
   function addCSS( url ) {
     var head = document.querySelector( 'head' );
@@ -30,7 +25,7 @@ define( [], function () {
         // R2 / NGW inconsistencies.
         req( ['main'], function ( main ) {
 
-          main.init( el, context, config, mediator );
+          main.init( el, rootPath );
 
         } );
       }, function ( err ) {
