@@ -638,7 +638,7 @@ define([
 
 				$tileImg.attr('src', imgSrc);
 				if(imgSrc) {
-					$tileImg.attr('srcset', self.createSrcset(imgSrc, [1, 2]) );
+					$tileImg.attr('srcset', self.createSrcset(imgSrc, self.options.assetSizes.pixelDensities) );
 				}
 
 				if($tileVid.length > 0) {

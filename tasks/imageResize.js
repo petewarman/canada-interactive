@@ -4,21 +4,24 @@ var rename = require("gulp-rename");
 var del = require('del');
 var settings = require('../settings.js');
 var sizes = settings.assetSizes.images;
+var pixelDensities = settings.assetSizes.pixelDensities
+var data = require('../src/data/data.json');
 
 gulp.task('imageResize', function () {
 
-	del(['src/images/**', '!src/images']).then(function (paths) {
-		console.log('Deleted files/folders:\n', paths.join('\n'));
-	});
+	del(['src/images/**', '!src/images']);
 
-	for(var i=0; i<sizes.length; i++) {
-		resize(sizes[i], 0.75);
-		resize(sizes[i], 0.5, 2);
+	for(var j=0;j<data.tiles.length;j++) {
+		for(var i=0; i<sizes.length; i++) {
+			for(var k=0; k<pixelDensities.length; k++) {
+				resize(data.tiles[j].img, sizes[i], Math.pow(0.75, pixelDensities[k]), pixelDensities[k]);
+			}
+		}
 	}
 
 });
 
-function resize(size, quality, scalingFactor) {
+function resize(file, size, quality, scalingFactor) {
 	scalingFactor = scalingFactor || 1;
 
 	var opts = {
@@ -30,19 +33,23 @@ function resize(size, quality, scalingFactor) {
 	};
 
 	if(scalingFactor === 1) {
-		console.log('resizing: ' + size + 'px' );
 
-		gulp.src('./original_assets/*.jpg')
+		console.log('resizing '+ file + ' to: ' + size + 'px' );
+
+		gulp.src('./original_assets/' + file)
 			.pipe(imageResize(opts))
 			.pipe(gulp.dest('src/images/' + size ));
-	} else {
-		console.log('resizing: ' + size + 'px @' + scalingFactor + 'x');
 
-		gulp.src('./original_assets/*.jpg')
+	} else {
+
+		console.log('resizing '+ file + ' to: ' + size + 'px @' + scalingFactor + 'x' );
+
+		gulp.src('./original_assets/' + file)
 			.pipe(imageResize(opts))
 			.pipe(rename({
 				suffix: "@" + scalingFactor + "x",
 			}))
-  			.pipe(gulp.dest('src/images/' + size ));
+			.pipe(gulp.dest('src/images/' + size ));
+
 	}
 } 

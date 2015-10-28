@@ -39,9 +39,9 @@ define([
 			"scrollRightButtonSelector": ".gallery__next",
 			"scrollLeftButtonSelector": ".gallery__prev",
 			"resetButtonSelector": ".header__reset",
-			"tilesPerAxisBreakPoint": 500,
-			"gutter": 10,
-			"landscapeMaxHeight": 750,
+			"tilesPerAxisBreakPoint": data.ui.tilesPerAxisBreakPoint,
+			"gutter": data.ui.gutter,
+			"landscapeMaxHeight": data.ui.landscapeMaxHeight,
 			"assetSizes": data.assetSizes
 		});
 	};

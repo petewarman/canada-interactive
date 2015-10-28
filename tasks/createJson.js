@@ -7,7 +7,8 @@ var spreadsheetUrl = settings.spreadsheetUrl;
 //'https://docs.google.com/spreadsheets/d/1HZUxbXVMdzPHRS-UrgOQP6yILPcUkTWAmR0nswDqxBw/pubhtml';
 
 var base = {
-	"assetSizes": settings.assetSizes
+	"assetSizes": settings.assetSizes,
+	"ui": settings.ui
 };
 
 function parseResponse(data) {

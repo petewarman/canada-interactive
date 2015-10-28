@@ -21,7 +21,8 @@ gulp.task('connect', function() {
 	});
 });
 
-gulp.task('clean', del.bind(null, [options.env + '-dist']));
+gulp.task('clean', del.bind(null, ['local-dist']));
+gulp.task('clean-remote', del.bind(null, ['remote-dist']));
 
 gulp.task('sass', function () {
 	gulp.src('./src/styles/main.scss')
@@ -90,9 +91,10 @@ gulp.task('build', ['clean'], function(){
 	gulp.start(['html', 'icons', 'images', 'videos', 'json', 'bootjs', 'sass', 'scripts']);
 });
 
-gulp.task('build-remote', function(){
+gulp.task('build-remote', ['clean-remote'], function(){
 	options.env = "remote";
-	gulp.start(['build']);
+	console.log('Clean up complete. Build ' + options.env);
+	gulp.start(['html', 'icons', 'images', 'videos', 'json', 'bootjs', 'sass', 'scripts']);
 });
 
 
