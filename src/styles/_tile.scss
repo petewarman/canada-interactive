@@ -12,6 +12,11 @@
 	to { transform: rotate(-360deg); }
 }
 
+@keyframes fadeIn {
+	from {opacity: 0;}
+	to {opacity: 1;}
+}
+
 .tile {
 	position: relative;
 	transform: translateZ(0);
@@ -247,6 +252,12 @@
 	transition: visibility 0s ($stage2Delay + $stage2Duration), opacity 0.3s ($stage2Delay + $stage2Duration);
 }
 
+.is-selected.is-playing .tile__details {
+	visibility: hidden;
+	opacity: 0;
+	transition-delay: 0s;
+}
+
 .change-selection .is-selected .tile__details {
 	transition: visibility 0s ($change-grow-delay + $change-grow-duration), opacity 0.3s ($change-grow-delay + $change-grow-duration);
 }
@@ -382,22 +393,25 @@
 	cursor: pointer;
 }
 
-.tile:hover .tile__expander {
+.tile:not(.is-selected):hover .tile__expander {
 	opacity: 1;
 	transform: none;
 	transition-delay: 0.2s
 }
 
 .tile.is-selected .tile__expander {
-	opacity: 1;
 	cursor: pointer;
-	transition-delay: $stage2Delay + $stage2Duration;
-	transition-duration: $stage2Duration;
+	animation: fadeIn #{$stage2Duration} ease-in #{$stage2Delay + $stage2Duration} normal both;
+	transition: none;
 	transform: none;
 	background-image: url(../icons/collapse.svg);
 	background-color: rgba($canada-red, 0.75);
 	width: 40px;
 	height: 40px;
+}
+
+.change-selection .tile.is-selected .tile__expander {
+	animation-delay: $change-grow-delay + $change-grow-duration;
 }
 
 @media screen and (min-height: 521px) and (min-width: 521px) {
