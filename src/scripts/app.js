@@ -767,7 +767,7 @@ define([
 			this.$gallery.packery('fit', $tile[0], fitX, fitY);
 			//this.$gallery.packery('sortItems');
 			//this.$gallery.packery();
-			this.tryToPlayTileVideo($tile);
+			//this.tryToPlayTileVideo($tile);
 			this.scrollToTile($tile);
 		},
 
