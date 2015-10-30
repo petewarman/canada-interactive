@@ -26,18 +26,16 @@ gulp.task('clean-remote', del.bind(null, ['remote-dist']));
 
 gulp.task('sass', function () {
 	gulp.src('./src/styles/main.scss')
-		.pipe($.sourcemaps.init())
 		.pipe($.sass().on('error', $.sass.logError))
 		.pipe($.autoprefixer({browsers: ['last 2 versions', 'ie >= 9']}))
 		.pipe($.replace("url(\"//", "url(\"http://"))
 		.pipe($.replace("url(../", "url(" + settings.root[options.env]))
-		.pipe($.sourcemaps.write())
-		.pipe(gulp.dest('./' + options.env + '-dist/styles'))
-		.pipe($.connect.reload());
+		.pipe($.minifyCss())
+		.pipe(gulp.dest('./' + options.env + '-dist/styles'));
 });
 
 gulp.task('icons', function(){
-	gulp.src('./src/icons/*.svg')
+	gulp.src('./src/icons/*')
 		.pipe(gulp.dest('./' + options.env + '-dist/icons'));
 });
 

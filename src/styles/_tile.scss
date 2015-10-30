@@ -63,7 +63,7 @@
 		position: absolute;
 		left: 0;
 		top: 0;
-		transition: opacity 0.3s;
+		transition: opacity 0.3s 0s, visibility 0s 0s;
 	}
 
 	video {
@@ -119,9 +119,11 @@
 
 .tile.is-playing .tile__img-holder img {
 	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.3s 0s, visibility 0s 0.3s;
 }
 
-.is-y-top .tile__img-holder {
+.is-y-start .tile__img-holder {
 	top: 0;
 }
 
@@ -130,12 +132,12 @@
 	transform: translateY(-50%);
 }
 
-.is-y-bottom .tile__img-holder {
+.is-y-end .tile__img-holder {
 	top: auto;
 	bottom: 0;
 }
 
-.is-x-left .tile__img-holder {
+.is-x-start .tile__img-holder {
 	left: 0;
 }
 
@@ -144,7 +146,7 @@
 	transform: translateX(-50%);
 }
 
-.is-x-right .tile__img-holder {
+.is-x-end .tile__img-holder {
 	left: auto;
 	right: 0;
 }
@@ -215,6 +217,9 @@
 }
 
 .is-loading .tile__video-control {
+	transform-origin: center center;
+	animation: spin 1s linear infinite;
+
 	.play,
 	.pause {
 		display: none;
@@ -222,8 +227,6 @@
 
 	.load {
 		display: block;
-		transform-origin: center center;
-		animation: spin 1s linear infinite;
 	}
 }
 
@@ -264,6 +267,10 @@
 
 .tile__text-holder {
 	display: inline;
+	-webkit-box-decoration-break: clone;
+	-ms-box-decoration-break: clone;
+	-o-box-decoration-break: clone;
+	box-decoration-break: clone;
 }
 
 .tile__title .tile__text-holder,
@@ -348,9 +355,14 @@
 	width: 100px;
 	height: 100px;
 	border-radius: 50%;
-	background: url(../icons/map.svg) center center no-repeat;
+	background: url(../icons/map.png) center center no-repeat;
 	background-size: 75% auto;
+}
 
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) { 
+	.tile__location {
+		background-image: url(../icons/map@2x.png) ;
+	}
 }
 
 .cat-1 .tile__location { background-color: rgba($cat-1-color, 0.75); }
@@ -383,14 +395,24 @@
 	position: absolute;
 	right: 10px;
 	bottom: 10px;
-	background: url(../icons/expand.svg) center center no-repeat;
-	background-size: contain;
 	width: 20px;
 	height: 20px;
 	opacity: 0;
 	transition: transform 0.4s, opacity 0.4s;
 	transform: scale(0.5);
 	cursor: pointer;
+
+	svg {
+		display: block;
+	}
+
+	g {
+		fill: #000
+	}
+
+	.collapse {
+		display: none;
+	}
 }
 
 .tile:not(.is-selected):hover .tile__expander {
@@ -404,10 +426,21 @@
 	animation: fadeIn #{$stage2Duration} ease-in #{$stage2Delay + $stage2Duration} normal both;
 	transition: none;
 	transform: none;
-	background-image: url(../icons/collapse.svg);
 	background-color: rgba($canada-red, 0.75);
 	width: 40px;
 	height: 40px;
+
+	g {
+		fill: #fff;
+	}
+
+	.collapse {
+		display: block;
+	}
+
+	.expand {
+		display: none;
+	}
 }
 
 .change-selection .tile.is-selected .tile__expander {

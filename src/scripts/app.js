@@ -26,9 +26,147 @@ define([
 		this.items = sortedItems;
 	}
 
+	Packery.prototype.snapFit = function( elem, x, y ) {
+		var item = this.getItem( elem );
+		if ( !item ) {
+		return;
+		}
+
+		// prepare internal properties
+		this._getMeasurements();
+
+		// stamp item to get it out of layout
+		this.stamp( item.element );
+		// required for positionPlaceRect
+		item.getSize();
+		// set placing flag
+		item.isPlacing = true;
+		// fall back to current position for fitting
+		x = x === undefined ? item.rect.x: x;
+		y = y === undefined ? item.rect.y: y;
+
+		// position it best at its destination
+		item.positionPlaceRect( x, y, true );
+
+		this._bindFitEvents( item );
+		item.goTo( item.placeRect.x, item.placeRect.y );
+		// layout everything else
+		this.layout();
+
+		// return back to regularly scheduled programming
+		this.unstamp( item.element );
+		this.sortItemsByPosition();
+		// un set placing flag, back to normal
+		item.isPlacing = false;
+		// copy place rect position
+		item.copyPlaceRectPosition();
+	};
+
+	Packery.prototype.doubleFit = function( elem1, x1, y1, type1, elem2, x2, y2, type2 ) {
+		var item1 = this.getItem( elem1 ),
+			item2 = this.getItem( elem2 );
+		if ( !item1 || !item2 ) {
+			return;
+		}
+
+		// prepare internal properties
+		this._getMeasurements();
+
+		// stamp item to get it out of layout
+		this.stamp( item1.element );
+		this.stamp( item2.element );
+		// required for positionPlaceRect
+		item1.getSize();
+		item2.getSize();
+		// set placing flag
+		item1.isPlacing = true;
+		item2.isPlacing = true;
+		// fall back to current position for fitting
+		x1 = x1 === undefined ? item1.rect.x: x1;
+		y1 = y1 === undefined ? item1.rect.y: y1;
+		x2 = x2 === undefined ? item2.rect.x: x2;
+		y2 = y2 === undefined ? item2.rect.y: y2;
+
+		// position it best at its destination
+		item1.positionPlaceRect( x1, y1, true );
+		item2.positionPlaceRect( x2, y2, true );
+
+		this._bindFitEvents( item1 );
+		this._bindFitEvents( item2 );
+		
+		if(type1 === 'snapFit') {
+			item1.goTo( item1.placeRect.x, item1.placeRect.y );
+		} else {
+			item1.moveTo( item1.placeRect.x, item1.placeRect.y );
+		}
+		if(type2 === 'snapFit') {
+			item2.goTo( item2.placeRect.x, item2.placeRect.y );
+		} else {
+			item2.moveTo( item2.placeRect.x, item2.placeRect.y );
+		}
+
+		// layout everything else
+		this.layout();
+
+		// return back to regularly scheduled programming
+		this.unstamp( item1.element );
+		this.unstamp( item2.element );
+
+		this.sortItemsByPosition();
+		// un set placing flag, back to normal
+		item1.isPlacing = false;
+		item2.isPlacing = false;
+		// copy place rect position
+		item1.copyPlaceRectPosition();
+		item2.copyPlaceRectPosition();
+	};
+
+	Packery.prototype.getItemIndex = function (ele) {
+		var item = _.findWhere(this.items, {"element": ele});
+		return _.indexOf(this.items, item);
+	}
+
 	Packery.Item.prototype.positionPlaceRect = function( x, y, isMaxOpen ) {
 		this.placeRect.x = this.getPlaceRectCoord( x, true, isMaxOpen );
 		this.placeRect.y = this.getPlaceRectCoord( y, false, isMaxOpen );
+	};
+
+	Packery.Item.prototype._transitionTo = function( x, y ) {
+		this.getPosition();
+		// get current x & y from top/left
+		var curX = this.position.x;
+		var curY = this.position.y;
+
+		var compareX = parseInt( x, 10 );
+		var compareY = parseInt( y, 10 );
+		var didNotMove = compareX === this.position.x && compareY === this.position.y;
+
+		// save end position
+		this.setPosition( x, y );
+
+		if(this.element.classList.contains('is-enlarged') && !this.element.classList.contains('is-selected') && !this.element.classList.contains('tile--big')) {
+			this.layoutPosition();
+			return;
+		}
+
+		// if did not move and not transitioning, just go to layout
+		if ( didNotMove && !this.isTransitioning ) {
+			this.layoutPosition();
+			return;
+		}
+
+		var transX = x - curX;
+		var transY = y - curY;
+		var transitionStyle = {};
+		transitionStyle.transform = this.getTranslate( transX, transY );
+
+		this.transition({
+			to: transitionStyle,
+			onTransitionEnd: {
+				transform: this.layoutPosition
+			},
+			isCleaning: true
+		});
 	};
 
 	bridget( 'packery', Packery );
@@ -71,8 +209,9 @@ define([
 			this.$scrollRightButton.on('click', this.scrollRight);
 			this.$scrollLeftButton.on('click', this.scrollLeft);
 			$(document).on('keydown', this.options.interactiveContainerSelector, this.onKeyUp);
-			this.$tiles.on('transitionend', _.debounce(this.onTileTransitionend, 200))
-			this.$tileImgHolders.on('transitionend', _.debounce(this.onTileImgHolderTransitionend, 200))
+			this.$tiles.on('transitionend', _.debounce(this.onTileTransitionend, 200));
+			this.$tileImgHolders.on('transitionend', _.debounce(this.onTileImgHolderTransitionend, 200));
+			this.$tileImgHolders.find('img').on('load', this.onTileImageLoad);
 			this.$gallery.on('transitionend', this.onGalleryTransitionend);
 			this.$tileCollapseButton.on('click', this.onTileCollapseButtonClick);
 			this.$tileCollapseButton.on('keyup', this.onEleKeyup);
@@ -85,12 +224,15 @@ define([
 			this.$container.on('touchmove', this.onTouchMove);
 			this.$container.on('touchend', this.onTouchEnd);
 			this.$container.on('touchcancel', this.onTouchCancel);
-
-
 			//this.$container.on('mousewheel DOMMouseScroll', this.onGalleryMouseWheel);
 		},
 
 	/* Event Handlers */
+
+		"onTileImageLoad": function(e) {
+			$(e.target).parents(this.options.tileSelector).data('hasLoadedImage', true);
+			this.checkAllImagesHaveLoaded();
+		},
 
 		"cancelDrag": function() {
 			this.$container.removeClass('is-dragging');
@@ -322,7 +464,10 @@ define([
 
 		"onTileClick": function(event) {
 			var $tile = $(event.currentTarget),
-				$selectedTile = this.$tiles.filter('.is-selected');
+				$selectedTile = this.$tiles.filter('.is-selected'),
+				fit,
+				expandOrigin = this.getTileExpansionOrigin($tile),
+				oldScrollTop = $(window).scrollTop();
 
 			this.tryToPauseTileVideo( this.$tiles.not($tile).filter('.is-selected') );
 
@@ -331,19 +476,24 @@ define([
 				this.tryToPlayOrPauseTileVideo($tile);
 			} else if (!$tile.hasClass('is-inactive')) {
 				if($selectedTile.length > 0) {
-
-					this.$gallery.addClass('change-selection');
-
-					if(
-						(this.orientation === 'landscape' && $selectedTile.position().left > $tile.position().left) ||
-						(this.orientation === 'portrait' && $selectedTile.position().top > $tile.position().top)
-					) {
-						this.deselectTile($selectedTile, true, {'x':'right', 'y': 'bottom'});
-					} else {
-						this.deselectTile($selectedTile, true, {'x':'left', 'y': 'top'});
-					}
+					this.changeSelectedTile($tile, $selectedTile);
+				} else {
+					this.selectTile($tile, expandOrigin);
+					fit = this.getFitParams(
+						$tile.position(), 
+						this.getTileExpansionOrigin($tile), 
+						true, 
+						$tile.hasClass('tile--big'), 
+						this.isLastTile($tile)
+					);
+					this.$gallery.packery(fit.type, $tile[0], fit.x, fit.y);
 				}
-				this.selectTile($tile, $selectedTile);
+
+				if (this.orientation === 'portrait') {
+					$(window).scrollTop(oldScrollTop);
+				}
+
+				this.scrollToTile($tile);
 			}
 		},
 
@@ -392,12 +542,13 @@ define([
 			$tiles.filter('.is-selected').find([this.options.tileCollapseButtonSelector, this.options.tileVideoControlSelector].join(', ')).attr('tabindex', 0);
 		},
 
-		"onTileCollapseButtonClick": function(e) {
+		"onTileCollapseButtonClick": function(event) {
 			var $tile = $(event.currentTarget).parents(this.options.tileSelector);
 
 			if($tile.hasClass('is-selected')) {
 				this.deselectTile($tile);
-				e.stopPropagation();
+				this.$gallery.packery();
+				event.stopPropagation();
 			}
 		},
 
@@ -512,7 +663,7 @@ define([
 				this.scrollTo((($tile.position().left + this.options.gutter) * -1) + ((this.$container.width() - $tile.width()) / 2));
 			} else {
 				this._isScrolling = true;
-				$('html, body').stop(true, false).animate({'scrollTop': $tile.offset().top - ((this.winHeight - $tile.width()) / 2)}, 800, 'linear', this.onGalleryTransitionend);
+				$('html, body').stop(true, false).animate({'scrollTop': $tile.offset().top - ((this.winHeight - $tile.width()) / 2)}, 300, 'linear', this.onGalleryTransitionend);
 			}
 		},
 
@@ -564,14 +715,14 @@ define([
 
 		"setDimensions": function() {
 			if (this.orientation === 'landscape') {
-				this.gallerySize = parseInt(this.winHeight - (this.options.gutter * 2) - this.headerHeight, 10);
+				this.gallerySize = Math.floor(this.winHeight - (this.options.gutter * 2) - this.headerHeight);
 
 				if (this.options.landscapeMaxHeight) { 
 					this.gallerySize = Math.min(this.gallerySize, this.options.landscapeMaxHeight); 
 				}
 
 			} else {
-				this.gallerySize = parseInt(this.$gallery.width(), 10);
+				this.gallerySize = Math.floor(this.$gallery.width());
 			}
 
 			this.tilesPerAxis = (this.gallerySize > this.options.tilesPerAxisBreakPoint) ? 3 : 2; //number of tiles per column or row
@@ -579,8 +730,9 @@ define([
 
 			this.$container.removeClass('tiles-per-axis-2 tiles-per-axis-3').addClass('tiles-per-axis-' + this.tilesPerAxis);
 
-			this.tileSize = this.getTileSize(this.gallerySize, this.tilesPerAxis, this.options.gutter);
+			this.tileSize = this.calculateTileSize(this.gallerySize, this.tilesPerAxis, this.options.gutter);
 			this.bigTileSize = (this.tileSize * this.bigTileRatio) + (this.options.gutter * (this.bigTileRatio - 1));
+			this.gallerySize = this.tilesPerAxis * (this.tileSize + this.options.gutter) - this.options.gutter;
 			this.selectedTileSize = this.gallerySize;
 
 			this.setGalleryDims();
@@ -617,39 +769,74 @@ define([
 			this.setTileWidth(this.$tiles.not('.is-selected').filter('.tile--big'), this.bigTileSize);
 		},
 
-		"getTileSize": function(gallerySize, tilesPerAxis, gutter) {
-			return parseInt((gallerySize - (gutter * (tilesPerAxis-1))) * (1 / tilesPerAxis), 10);
+		"calculateTileSize": function(gallerySize, tilesPerAxis, gutter) {
+			return Math.floor((gallerySize - (gutter * (tilesPerAxis-1))) * (1 / tilesPerAxis));
 		},
 
 		"setTileWidth": function($tiles, width) {
-			var self = this;
+			$tiles.each(this.setTileImage)
+				.width(width).height(width)
+				.find(this.options.tileImgHolderSelector).width(width).height(width);
+		},
 
-			$tiles.each(function(ind, tile){
-				var $tile = $(tile),
-					$tileImg = $tile.find('img[data-filename]'),
-					$tileVid = $tile.find('video'),
-					imgFilename = $tileImg.data('filename'),
-					dpr = window.devicePixelRatio || 1,
-					imgSize = self.selectMediaSize(width, self.options.assetSizes.images), //[1024, 840, 768, 640, 480, 320, 240, 160, 100]
-					vidSize = self.selectMediaSize(width * dpr, self.options.assetSizes.videos), //[1080]
-					imgSrc = [self.options.rootPath + 'images', imgSize, imgFilename].join('/'),
-					vidFilename,
-					vidSrc;
+		"setTileImage": function(ind, tile) {
+			var $tile = $(tile),
+				$tileImg = $tile.find('img[data-filename]'),
+				tileSize = this.getTileSize($tile),
+				imgFilename = $tileImg.data('filename'),
+				dpr = window.devicePixelRatio || 1,
+				imgSize = this.selectMediaSize(tileSize, this.options.assetSizes.images),
+				imgSrc = [this.options.rootPath + 'images', imgSize, imgFilename].join('/'),
+				$tileVid = $tile.find('video'),
+				oldImgSize = $tileImg.data('img-size'),
+				oldVidSize = $tile.data('vid-size');
 
-				$tileImg.attr('src', imgSrc);
-				if(imgSrc) {
-					$tileImg.attr('srcset', self.createSrcset(imgSrc, self.options.assetSizes.pixelDensities) );
-				}
+			//don't bother loading in smaller images, just downsample those already loaded
+			if(oldImgSize && oldImgSize > imgSize) {
+				return;
+			}
 
-				if($tileVid.length > 0) {
-					vidFilename = $tileVid.data('filename');
-					vidSrc = [self.options.rootPath + 'videos', vidSize, vidFilename].join('/');
+			if(imgSrc) {
+				$tileImg.attr('src', imgSrc).data('img-size', imgSize);
+				$tileImg.attr('srcset', this.createSrcset(imgSrc, this.options.assetSizes.pixelDensities) );
+			}
 
-					$tileVid.attr('poster', imgSrc).attr('src', vidSrc);
-				}
-			})
-			.width(width).height(width)
-			.find(this.options.tileImgHolderSelector).width(width).height(width);
+			if($tileVid.length > 0 && $tile.data('videoSrcIsSet')) {
+				this.setTileVideo(ind, tile);
+			}
+		},
+
+		"getTileSize": function($tile) {
+			return $tile.hasClass('is-selected') ? this.selectedTileSize : $tile.hasClass('tile--big') ? this.bigTileSize : this.tileSize;
+		},
+
+		"setTileVideo": function(ind, tile) {
+			var $tile = $(tile),
+				$tileVid = $tile.find('video'),
+				$tileImg = $tile.find('img[data-filename]'),
+				imgFilename = $tileImg.data('filename'),
+				dpr = window.devicePixelRatio || 1,
+				vidSize = this.selectMediaSize(this.selectedTileSize * dpr, this.options.assetSizes.videos),
+				posterSize = this.selectMediaSize(this.selectedTileSize, this.options.assetSizes.images),
+				posterSrc = this.addImageDprSuffix([this.options.rootPath + 'images', posterSize, imgFilename].join('/'), dpr),
+				vidFilename;
+
+			if($tile.data('vid-size') && $tile.data('vid-size') === vidSize) {
+				return;
+			}
+
+			if($tileVid.length > 0) {
+				vidFilename = $tileVid.data('filename');
+				$tileVid.attr('poster', posterSrc).attr('src', [this.options.rootPath + 'videos', vidSize, vidFilename].join('/'));
+				$tile.data('videoSrcIsSet', true).data('vid-size', vidSize);
+			}
+		},
+
+		"addImageDprSuffix": function(url, dpr) {
+			if(dpr === 1) {
+				return url;
+			}
+			return url.slice(0, -4) + '@' + dpr + 'x' + url.slice(-4);
 		},
 
 		"createSrcset": function(baseSrc, pxDensities) {
@@ -658,11 +845,7 @@ define([
 				src;
 
 			for(i=0; i<pxDensities.length; i++) {
-				if(pxDensities[i] !== 1) {
-					src = baseSrc.slice(0, -4) + '@' + pxDensities[i] + 'x' + baseSrc.slice(-4) + ' ' + pxDensities[i] + 'x';
-				} else {
-					src = baseSrc + ' 1x';
-				}
+				src = this.addImageDprSuffix(baseSrc, pxDensities[i]) + ' ' + pxDensities[i] + 'x';
 				srcsets.push(src);
 			}
 
@@ -682,6 +865,27 @@ define([
 
 		},
 
+		"checkAllImagesHaveLoaded": function() {
+			var allLoaded = true;
+
+			this.$tiles.each(function(i, tile){
+				if(!$(tile).data('hasLoadedImage')) {
+					allLoaded = false;
+				}
+			});
+
+			if(allLoaded) {
+				this.preloadVideos();
+			}
+		},
+
+		"preloadVideos": function() {
+			if(!this._vidsPreloaded) {
+				this._vidsPreloaded = true;
+				this.$tiles.each(this.setTileVideo);
+			}
+		},
+
 	/* tile selection/deselection */
 
 		"deselectTile": function($tiles, noFocusTransfer, shrinkOrigin) {
@@ -689,7 +893,7 @@ define([
 
 			if ($tiles.length > 0) {
 
-				$tiles.removeClass('is-x-left is-x-center is-x-right is-y-top is-y-center is-y-bottom');
+				$tiles.removeClass('is-x-start is-x-center is-x-end is-y-start is-y-center is-y-end');
 
 				if (shrinkOrigin) {
 					$tiles.addClass('is-x-' + shrinkOrigin.x + ' is-y-' + shrinkOrigin.y);
@@ -709,11 +913,11 @@ define([
 					}
 				});
 
-				//this.$gallery.packery('sortItems');
-				if(!this.$gallery.hasClass('change-selection')) {
-					this.$gallery.packery();
-				}
-				$tiles.find([this.options.tileCollapseButtonSelector, this.options.tileVideoControlSelector].join(', ')).removeAttr('tabindex');
+				$tiles.find([
+					this.options.tileCollapseButtonSelector, 
+					this.options.tileVideoControlSelector
+				].join(', ')).removeAttr('tabindex');
+
 				if(!noFocusTransfer) {
 					$tiles.attr('tabindex', 0).trigger('focus');
 				}
@@ -721,93 +925,170 @@ define([
 			}
 		},
 
-		"selectTile": function($tile, $prevTile) {
-			var currColumn,
-				targetOffset,
-				tilePos = $tile.position(),
-				expandOrigin = this.getTileExpansionOrigin($tile, $prevTile),
-				fitX = 0,
-				fitY = 0;
+		"changeSelectedTile": function($tile, $prevTile) {
+			var collapseOrigin = {'x':'start', 'y': 'start'};
+			var expandOrigin = this.getTileExpansionOrigin($tile, $prevTile);
 
-			this.$gallery.addClass('has-selected');
-			$tile.removeAttr('tabindex').find(this.options.tileCollapseButtonSelector).attr('tabindex', 0).trigger('focus');
-			$tile.find(this.options.tileVideoControlSelector).attr('tabindex', 0);
-			$tile.addClass('is-selected').addClass('is-enlarged');
+			this.$gallery.addClass('change-selection');
 
-			$tile.removeClass('is-x-left is-x-center is-x-right is-y-top is-y-center is-y-bottom');
-			$tile.addClass('is-x-' + expandOrigin.x + ' is-y-' + expandOrigin.y);
+			if(
+				(this.orientation === 'landscape' && $prevTile.position().left > $tile.position().left) ||
+				(this.orientation === 'portrait' && $prevTile.position().top > $tile.position().top)
+			) {
+				collapseOrigin = {'x':'end', 'y': 'end'};
+			} 
 
-			this.setTileWidth($tile, this.selectedTileSize);
+			this.deselectTile($prevTile, true, collapseOrigin);
+			this.selectTile($tile, expandOrigin);
 
-			if (this.orientation === 'landscape') {
+			var fit = this.getFitParams($tile.position(), expandOrigin, true, $tile.hasClass('tile--big'), this.isLastTile($tile));
+			var prevFit = this.getFitParams($prevTile.position(), collapseOrigin, false, $prevTile.hasClass('tile--big'), this.isLastTile($prevTile), fit);
 
-				if(expandOrigin.x === 'left') {
-					fitX = tilePos.left;
-				} else if(expandOrigin.x === 'center') {
-					fitX = tilePos.left - (this.tileSize + this.options.gutter);
-				} else {
-					fitX = (this.tilesPerAxis === 3) ? tilePos.left - (this.tileSize + this.options.gutter) * 2 : tilePos.left - (this.tileSize + this.options.gutter);
-				}
-
-				fitX = Math.max(fitX, 0);
-
+			if(fit.cancelDouble) {
+				this.$gallery.packery(fit.type, $tile[0], fit.x, fit.y);
 			} else {
-
-				if(expandOrigin.y === 'top') {
-					fitY = tilePos.top;
-				} else if(expandOrigin.x === 'center') {
-					fitY = tilePos.top - (this.tileSize + this.options.gutter);
-				} else {
-					fitY = (this.tilesPerAxis === 3) ? tilePos.top - (this.tileSize + this.options.gutter) * 2 : tilePos.top - (this.tileSize + this.options.gutter);
-				}
-
-				fitY = Math.max(fitY, 0);
+				this.$gallery.packery('doubleFit', $tile[0], fit.x, fit.y, fit.type, $prevTile[0], prevFit.x, prevFit.y, prevFit.type);
 			}
-
-			this.$gallery.packery('fit', $tile[0], fitX, fitY);
-			//this.$gallery.packery('sortItems');
-			//this.$gallery.packery();
-			//this.tryToPlayTileVideo($tile);
-			this.scrollToTile($tile);
 		},
 
-		"getTileExpansionOrigin": function($tile, $selectedTile) {
-			var tilePos = $tile.position(),
-				expandOrigin = {},
-				scrollCenter;
+		"isLastTile": function($tile) {
+			var tileIndexByPosition = this.$gallery.packery('getItemIndex', $tile.get(0));
+			return tileIndexByPosition === (this.$tiles.length - 1);
+		},
+
+		"selectTile": function($tile, expandOrigin) {
+			var expandOrigin = expandOrigin || { x: 'start', y: 'start' },
+				fit;
+
+			//update classes
+			this.$gallery.addClass('has-selected');
+			$tile.removeClass('is-x-start is-x-center is-x-end is-y-start is-y-center is-y-end')
+				.addClass('is-selected is-enlarged is-x-' + expandOrigin.x + ' is-y-' + expandOrigin.y);
+
+			//update tabindexes
+			$tile.removeAttr('tabindex').find(this.options.tileCollapseButtonSelector).attr('tabindex', 0).trigger('focus');
+			$tile.find(this.options.tileVideoControlSelector).attr('tabindex', 0);
+
+			//check video source is set
+			if( !$tile.data('videoSrcIsSet') ) {
+				this.setTileVideo(0, $tile.get(0));
+			}
+
+			//set width
+			this.setTileWidth($tile, this.selectedTileSize);
+
+			//fit it
+			// fit = this.getFitParams($tile.position(), expandOrigin, true, $tile.hasClass('tile--big'), this.isLastTile($tile));
+			// this.$gallery.packery(fit.type, $tile[0], fit.x, fit.y);
+		},
+
+		"getFitParams": function(tilePos, transformOrigin, grow, isBig, isLast, fitAround) {
+			var fit = {
+					'x': 0,
+					'y': 0,
+					'type': 'snapFit'
+				},
+				dir = grow ? -1 : 1,
+				primaryAxis = 'y',
+				primaryOffset = 'top',
+				secondaryAxis = 'x',
+				secondaryOffset = 'left',
+				axisUnit = this.tileSize + this.options.gutter,
+				tileSize = isBig ? axisUnit * this.bigTileRatio : axisUnit;
 
 			if (this.orientation === 'landscape') {
+				primaryAxis = 'x';
+				primaryOffset = 'left';
+				secondaryAxis = 'y';
+				secondaryOffset = 'top';
+			}
 
-				if(Math.abs(tilePos.top) < this.options.gutter) {
-					expandOrigin.y = 'top';
-				} else if(this.tilesPerAxis === 3 && tilePos.top - (this.tileSize + this.options.gutter) <= this.options.gutter) {
-					expandOrigin.y = 'center';
-				} else {
-					expandOrigin.y = 'bottom';
-				}
-
-				if($selectedTile && $selectedTile.length > 0 && $selectedTile.position().left < tilePos.left) {
-					expandOrigin.x = 'right';
-				} else {
-					expandOrigin.x = 'left';
-				}
-
+			//primary axis
+			if(transformOrigin[primaryAxis] === 'start') {
+				fit[primaryAxis] = tilePos[primaryOffset];
+			} else if(transformOrigin[primaryAxis] === 'center') {
+				fit[primaryAxis] = tilePos[primaryOffset] + dir * axisUnit;
 			} else {
+				fit[primaryAxis] = tilePos[primaryOffset] + dir * axisUnit * (this.tilesPerAxis - 1);
+			}
 
-				if(Math.abs(tilePos.left) < this.options.gutter) {
-					expandOrigin.x = 'left';
-				} else if(this.tilesPerAxis === 3 && tilePos.left - (this.tileSize + this.options.gutter) <= this.options.gutter) {
-					expandOrigin.x = 'center';
+			//if shrinking calculate secondary axis
+			if(!grow) {
+				if(transformOrigin[secondaryAxis] === 'start') {
+					fit[secondaryAxis] = 0;
+				} else if(transformOrigin[secondaryAxis] === 'center' || isBig) {
+					fit[secondaryAxis] = axisUnit;
 				} else {
-					expandOrigin.x = 'right';
+					fit[secondaryAxis] = axisUnit * (this.tilesPerAxis - 1);
 				}
+			}
 
-				if($selectedTile && $selectedTile.length > 0 && $selectedTile.position().top < tilePos.top) {
-					expandOrigin.y = 'bottom';
-				} else {
-					expandOrigin.y = 'top';
+			//collision detection
+			if(fitAround) {
+				//make sure there's space to the left
+				if(fit[primaryAxis] < fitAround[primaryAxis] && (fit[primaryAxis] + tileSize) > fitAround[primaryAxis]) {
+					if(fit[primaryAxis] === 0) {
+						fit[primaryAxis] = fitAround[primaryAxis] + (axisUnit * this.tilesPerAxis);
+					} else {
+						fit[primaryAxis] -= axisUnit;
+					}
+					fit.type = 'fit';
 				}
+				//make sure there's space to the right
+				if(fit[primaryAxis] >= fitAround[primaryAxis] && fit[primaryAxis] < fitAround[primaryAxis] + (axisUnit * this.tilesPerAxis) ) {
+					fit[primaryAxis] = fitAround[primaryAxis] + (axisUnit * this.tilesPerAxis);
+					fit.type = 'fit';
+				}
+			}
 
+			//special case if the last tile is big
+			if(isLast && isBig && (this.tilesPerAxis === 3)) {
+				if(tilePos[secondaryOffset] === 0) {
+					fit[primaryAxis] = tilePos[primaryOffset] - (3 * axisUnit);
+				}
+				fit.type = 'fit';
+				fit.cancelDouble = 'true';
+			}
+
+			fit[primaryAxis] = this.roundToTile(fit[primaryAxis]);
+			fit[secondaryAxis] = this.roundToTile(fit[secondaryAxis]);
+
+			return fit;
+		},
+
+		"roundToTile": function(offset) {
+			var unit = (this.tileSize + this.options.gutter);
+			return Math.max(unit * Math.round(offset / unit), 0);
+		},
+
+		"getTileExpansionOrigin": function($tile, $prevTile) {
+			var tilePos = $tile.position(),
+				expandOrigin = {
+					x: 'start',
+					y: 'start'
+				},
+				primaryOffset = 'top',
+				primaryAxis = 'y',
+				secondaryOffset = 'left',
+				secondaryAxis = 'x';
+
+			if (this.orientation === 'landscape') {
+				primaryOffset = 'left';
+				primaryAxis = 'x';
+				secondaryOffset = 'top';
+				secondaryAxis = 'y';
+			}
+
+			if(Math.abs(tilePos[secondaryOffset]) < this.options.gutter) {
+				expandOrigin[secondaryAxis] = 'start';
+			} else if(this.tilesPerAxis === 3 && tilePos[secondaryOffset] - (this.tileSize + this.options.gutter) <= this.options.gutter && !$tile.hasClass('tile--big')) {
+				expandOrigin[secondaryAxis] = 'center';
+			} else {
+				expandOrigin[secondaryAxis] = 'end';
+			}
+
+			if($prevTile && $prevTile.length > 0 && $prevTile.position()[primaryOffset] < tilePos[primaryOffset]) {
+				expandOrigin[primaryAxis] = 'end';
 			}
 
 			return expandOrigin;
@@ -933,7 +1214,10 @@ define([
 		'onTouchEnd',
 		'onTouchCancel',
 		'momentumScroll',
-		'momentumScrollStep'
+		'momentumScrollStep',
+		'onTileImageLoad',
+		'setTileImage',
+		'setTileVideo'
 	);
 
 	return app;

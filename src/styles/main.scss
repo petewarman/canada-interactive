@@ -55,9 +55,10 @@ $guss-webfonts-base-url: '//pasteup.guim.co.uk/fonts/';
 		&.change-selection {
 		}
 
-		.is-dragging & {
-			transition: none;
-		}
+	}
+
+	.is-dragging .gallery {
+		transition: none;
 	}
 
 	.gallery__next,
