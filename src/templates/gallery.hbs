@@ -1,16 +1,14 @@
 <div class="interactive-container grid-gallery" tabindex="0" data-root="{{rootPath}}">
 		<header class="header">
 			<button type="button" class="header__reset header__button">
-				<span class="icon"><img src="{{ rootPath }}icons/reset.svg" /></span>
+				<span class="icon" style="background-image: url({{ rootPath }}icons/reset.svg)"></span>
 				<span class="text">reset</span>
 			</button>
 			<ul class="header__category-list">
 			{{#each categories}}
 				<li class="header__category-item">
 					<button data-tile-class="cat-{{ this.id }}" type="button" class="header__button header__category-button header__category-button--{{ this.id }} is-active">
-						<span class="icon">
-							<img src="{{ ../rootPath }}icons/{{ this.icon }}.svg" />
-						</span>
+						<span class="icon" style="background-image: url({{ ../rootPath }}icons/{{ this.icon }}.svg)"></span>
 						<span class="text">{{ this.text }}</span>
 					</button>
 				</li>
@@ -64,7 +62,7 @@
 						{{#if this.links}}
 							<ul class="tile__links">
 								{{#each this.links}}
-								<li class="tile__link-item"><a class="tile__link tile__text-holder" href="{{ this.url }}">{{ this.text }}</a></li>
+								<li class="tile__link-item"><a class="tile__link tile__text-holder" href="{{ this.url }}" target="_blank">{{ this.text }}</a></li>
 								{{/each}}
 							</ul>
 						{{/if}}

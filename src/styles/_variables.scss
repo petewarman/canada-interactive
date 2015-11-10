@@ -30,4 +30,6 @@ $change-grow-delay: $change-shrink-duration + $change-move-duration;
 $change-ease: ease-out;
 
 $vid-control-size: 40px;
-$vid-control-size-big: 100px;
+$vid-control-size-big: 70px;
+$vid-control-size-big--large-bp: 100px;
+$vid-control-size-big--small-bp: 50px;

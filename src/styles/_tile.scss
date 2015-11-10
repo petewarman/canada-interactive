@@ -169,6 +169,7 @@
 	z-index: 2;
 	transition: all 0.3s;
 	cursor: pointer;
+	outline: 0;
 
 	svg {
 		display: block;
@@ -193,11 +194,18 @@
 	// }
 }
 
+
+
 .is-selected .tile__video-control {
 	//opacity: 1;
-	width: $vid-control-size-big;
-	height: $vid-control-size-big;
-	margin: $vid-control-size-big/(-2) 0 0 $vid-control-size-big/(-2);
+	width: $vid-control-size-big--small-bp;
+	height: $vid-control-size-big--small-bp;
+	margin: $vid-control-size-big--small-bp/(-2) 0 0 $vid-control-size-big--small-bp/(-2);
+	transition-delay: $stage1Duration;
+}
+
+.change-selection .is-selected .tile__video-control {
+	transition-delay: $change-grow-delay;
 }
 
 .is-playing .tile__video-control {
@@ -307,7 +315,7 @@
 	text-transform: uppercase;
 	max-width: 50%;
 	padding: 0 $text-padding;
-	margin: 10px 0 20px;
+	margin: 5px 0;
 	font-weight: bold;
 	@include tile-element-sizer(14, 2);
 }
@@ -316,14 +324,14 @@
 	max-width: 50%;
 	text-transform: uppercase;
 	padding: 0 $text-padding;
-	margin-bottom: 20px;
+	margin-bottom: 5px;
 	@include tile-element-sizer(12, 2);
 }
 
 .tile__description {
 	max-width: 50%;
 	padding: 0 $text-padding;
-	margin-bottom: 20px;
+	margin-bottom: 5px;
 	font-weight: bold;
 	@include tile-element-sizer(12, 2);
 }
@@ -447,13 +455,31 @@
 	animation-delay: $change-grow-delay + $change-grow-duration;
 }
 
+@media screen and (min-height: 360px) and (min-width: 360px) {
+	.tile__title { margin: 10px 0;}
+	.tile__date { margin-bottom: 10px;}
+	.tile__description { margin-bottom: 10px;}
+
+	.is-selected:not(.is-playing) .tile__video-control {
+		width: $vid-control-size-big;
+		height: $vid-control-size-big;
+		margin: $vid-control-size-big/(-2) 0 0 $vid-control-size-big/(-2);
+	}
+}
+
 @media screen and (min-height: 521px) and (min-width: 521px) {
-	.tile__title { @include tile-element-sizer(18, 3); }
-	.tile__date { @include tile-element-sizer(14, 2); }
-	.tile__description { @include tile-element-sizer(14, 2); }
+	.tile__title { @include tile-element-sizer(18, 3); margin-bottom: 20px;}
+	.tile__date { @include tile-element-sizer(14, 2); margin-bottom: 20px;}
+	.tile__description { @include tile-element-sizer(14, 2); margin-bottom: 20px;}
 	.tile__link-item { @include tile-element-sizer(14, 2); }
 	.tile__location-text { @include tile-element-sizer(14, 2); }
 	.tile__location { width: 120px; height: 120px; }
+
+	.is-selected:not(.is-playing) .tile__video-control {
+		width: $vid-control-size-big--large-bp;
+		height: $vid-control-size-big--large-bp;
+		margin: $vid-control-size-big--large-bp/(-2) 0 0 $vid-control-size-big--large-bp/(-2);
+	}
 }
 
 @media screen and (min-height: 600px) and (min-width: 600px) {

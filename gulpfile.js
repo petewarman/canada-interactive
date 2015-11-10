@@ -59,6 +59,7 @@ gulp.task('json', function(){
 
 gulp.task('html', function(){
 	gulp.src('./src/*.html')
+		.pipe($.replace("{{ settings }}", JSON.stringify(settings)))
 		.pipe(gulp.dest('./' + options.env + '-dist'));
 });
 
@@ -94,7 +95,6 @@ gulp.task('build-remote', ['clean-remote'], function(){
 	console.log('Clean up complete. Build ' + options.env);
 	gulp.start(['html', 'icons', 'images', 'videos', 'json', 'bootjs', 'sass', 'scripts']);
 });
-
 
 gulp.task('watch', function () {
 	gulp.watch(['./src/styles/*.scss'], ['sass']);

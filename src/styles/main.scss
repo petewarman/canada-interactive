@@ -24,7 +24,7 @@ $guss-webfonts-base-url: '//pasteup.guim.co.uk/fonts/';
 	@import 'tile';
 
 	button {
-		font-family: inherit;
+		font-family: 'Guardian Agate Sans 1 Web', sans-serif;
 	}
 
 	.container {
@@ -39,8 +39,7 @@ $guss-webfonts-base-url: '//pasteup.guim.co.uk/fonts/';
 	}
 
 	.gallery {
-		border: $gutter solid #fff;
-		background: $white;
+		margin-top: $gutter;
 		transition-property: transform;
 		transition-duration: $stage2Duration;
 		transition-delay: $stage2Delay;

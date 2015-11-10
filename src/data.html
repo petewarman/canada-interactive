@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Generate Json</title>
+
+</head>
+<body>
+
+    <div class="json-holder"></div>
+
+<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>
+
+var catData;
+var catsLoaded = false;
+var tileData;
+var tilesLoaded = false;
+
+var settings = {{ settings }};
+var spreadsheetUrl = settings.spreadsheetUrl;
+
+var tilesWorksheetId = 'od6';
+var catsWorksheetId = 'oissu5r';
+var sheetId = '1HZUxbXVMdzPHRS-UrgOQP6yILPcUkTWAmR0nswDqxBw';
+
+var tilesJsonpUrl = 'https://spreadsheets.google.com/feeds/list/' + sheetId + '/' + tilesWorksheetId + '/public/full?alt=json-in-script&callback=parseTiles';
+var catsJsonpUrl = 'https://spreadsheets.google.com/feeds/list/' + sheetId + '/' + catsWorksheetId + '/public/full?alt=json-in-script&callback=parseCats';
+
+
+var base = {
+    "assetSizes": settings.assetSizes,
+    "ui": settings.ui
+};
+
+$(document).ready(function(){
+    var tileScript = $('<script>').attr('src', tilesJsonpUrl);
+    var catsScript = $('<script>').attr('src', catsJsonpUrl);
+    $('body').append(tileScript);
+    $('body').append(catsScript);
+});
+
+function parseCats(data) {
+    catData = data;
+    catsLoaded = true;
+
+    parseResponse();
+}
+
+function parseTiles(data) {
+    tileData = data;
+    tilesLoaded = true;
+
+    parseResponse();
+}
+
+function parseResponse() {
+    if(!(catsLoaded && tilesLoaded)) { return; }
+
+    var tileEntries = tileData.feed.entry;
+    var catEntries = catData.feed.entry;
+
+    var tiles = [];
+    var cats = [];
+
+    //var $tileRows = $(data).find('table:first tbody tr');
+    //var $catRows = $(data).find('table:eq(1) tbody tr');
+    for (var i = 0; i < tileEntries.length; i++) {
+        var tile = formatTileData(tileEntries[i]);
+        if(tile.img && tile.categoryId) {
+            tiles.push(tile);
+        }
+    }
+
+    for (var i = 0; i < catEntries.length; i++) {
+        cats.push( formatCatData(catEntries[i]) );
+    }
+
+    //make first tile big
+    tiles[0].isBig = true;
+
+    base.tiles = tiles;
+    base.categories = cats;
+
+    $('.json-holder').text(JSON.stringify(base));
+
+}
+
+function formatCatData(d) {
+    var obj = {};
+
+    if(d.gsx$id.$t) { obj.id = d.gsx$id.$t; }
+    if(d.gsx$name.$t) { obj.text = d.gsx$name.$t; }
+    if(d.gsx$icon.$t) { obj.icon = d.gsx$icon.$t; }
+
+    return obj;
+}
+
+function formatTileData(d) {
+    var obj = {};
+
+    if(d.gsx$name.$t) { obj.name = d.gsx$name.$t; }
+    if(d.gsx$date.$t) { obj.date = d.gsx$date.$t; }
+    if(d.gsx$description.$t) { obj.description = d.gsx$description.$t; }
+    if(d.gsx$link1text.$t || d.gsx$link2text.$t) {
+        obj.links = [];
+
+        if(d.gsx$link1text.$t) {
+            obj.links.push({
+                "text": d.gsx$link1text.$t,
+                "url": d.gsx$link1url.$t
+            });
+        }
+
+        if(d.gsx$link2text.$t) {
+            obj.links.push({
+                "text": d.gsx$link2text.$t,
+                "url": d.gsx$link2url.$t
+            });
+        }
+    }
+    if(d.gsx$location.$t) { obj.location = d.gsx$location.$t; }
+    if(d.gsx$mapx.$t) { obj['location-marker-x'] = d.gsx$mapx.$t; }
+    if(d.gsx$mapy.$t) { obj['location-marker-y'] = d.gsx$mapy.$t; }
+    if(d.gsx$categoryid.$t) { obj.categoryId = d.gsx$categoryid.$t; }
+    if(d.gsx$imagefilename.$t) { obj.img = d.gsx$imagefilename.$t; }
+    if(d.gsx$alttext.$t) { obj.imgAlt = d.gsx$alttext.$t; }
+    if(d.gsx$videofilename.$t) { obj.video = d.gsx$videofilename.$t; }
+
+    return obj;
+}
+
+
+</script>
+</body>
+</html>

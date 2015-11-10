@@ -7,22 +7,18 @@
 }
 
 .header__button {
+	font-size: 11px;
+
 	.icon {
 		display: inline-block;
 		position: relative;
 		vertical-align: middle;
-		width: 25px;
-		height: 25px;
-		margin-right: 3px;
-
-		img {
-			max-width: 100%;
-			max-height: 100%;
-			position: absolute;
-			left: 50%;
-			top: 50%;
-			transform: translate(-50%, -50%);
-		}
+		width: 16px;
+		height: 16px;
+		margin-right: 1px;
+		background-repeat: no-repeat;
+		background-position: center;
+		background-size: contain;
 	}
 
 	.text {
@@ -30,6 +26,24 @@
 		vertical-align: middle;
 	}
 
+}
+
+@media screen and (min-width: 360px) {
+	.header__button .icon {
+		width: 25px;
+		height: 25px;
+		margin-right: 3px;
+	}
+}
+
+@media screen and (min-width: 640px) {
+	.header__button {
+		font-size: 14px;
+
+		.icon {
+			margin-right: 5px;
+		}
+	}
 }
 
 .header__reset {

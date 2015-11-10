@@ -715,7 +715,7 @@ define([
 
 		"setDimensions": function() {
 			if (this.orientation === 'landscape') {
-				this.gallerySize = Math.floor(this.winHeight - (this.options.gutter * 2) - this.headerHeight);
+				this.gallerySize = Math.floor(this.winHeight - (this.options.gutter) - this.headerHeight);
 
 				if (this.options.landscapeMaxHeight) { 
 					this.gallerySize = Math.min(this.gallerySize, this.options.landscapeMaxHeight); 
