@@ -44,7 +44,13 @@ define([
 			"landscapeMaxHeight": data.ui.landscapeMaxHeight,
 			"assetSizes": data.assetSizes
 		});
+
+		startTracking();
 	};
+
+	function startTracking(){
+		window._satellite.pageBottom();
+	}
 
 	function init(el, root) {
 		interactiveEl = el;

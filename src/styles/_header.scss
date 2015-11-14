@@ -78,6 +78,10 @@
 	float: left;
 	position: relative;
 	box-sizing: border-box;
+
+	&:before {
+		display: none !important;
+	}
 }
 
 .header__category-button--1.is-active {

@@ -185,6 +185,7 @@ define([
 			this.initializePackery();
 			this.setScrollButtonStates();
 			this.addEventListeners();
+			this.checkAllImagesHaveLoaded();
 		},
 
 	/* Set Up */
@@ -827,7 +828,7 @@ define([
 
 			if($tileVid.length > 0) {
 				vidFilename = $tileVid.data('filename');
-				$tileVid.attr('poster', posterSrc).attr('src', [this.options.rootPath + 'videos', vidSize, vidFilename].join('/'));
+				$tileVid.attr('poster', posterSrc).attr('src', [this.options.rootPath + 'videos', vidSize, vidFilename].join('/')).attr('preload', 'auto');
 				$tile.data('videoSrcIsSet', true).data('vid-size', vidSize);
 			}
 		},
@@ -866,16 +867,27 @@ define([
 		},
 
 		"checkAllImagesHaveLoaded": function() {
+			if(this.allLoaded) { return; }
+
 			var allLoaded = true;
 
 			this.$tiles.each(function(i, tile){
-				if(!$(tile).data('hasLoadedImage')) {
-					allLoaded = false;
+				var $tile = $(tile);
+
+				if(!$tile.data('hasLoadedImage')) {
+					if($tile.find('img').get(0).complete) {
+						$(tile).data('hasLoadedImage', true);
+					} else {
+						allLoaded = false;
+					}
 				}
 			});
 
 			if(allLoaded) {
+				this.allLoaded = true;
 				this.preloadVideos();
+			} else {
+				setTimeout(this.checkAllImagesHaveLoaded, 500);
 			}
 		},
 
@@ -1097,9 +1109,9 @@ define([
 	/* Video controllers */
 
 		"tryToPlayOrPauseTileVideo": function($tiles) {
-			if ($tiles.length > 0) {
-
 			var self = this;
+
+			if ($tiles.length > 1) {
 
 				$tiles.each(function(i, tile){
 					var $tile = $(tile),
@@ -1114,6 +1126,16 @@ define([
 					}
 
 				});
+			} else if ($tiles.length === 1) {
+				var $video = $tiles.find('video');
+
+				if($video.length > 0) { 
+					if($video.get(0).paused) {
+						self.tryToPlayTileVideo($tiles);
+					} else {
+						self.tryToPauseTileVideo($tiles);
+					}
+				}
 			}
 
 		},
@@ -1123,7 +1145,7 @@ define([
 		"tryToPlayTileVideo": function($tiles) {
 			var self = this;
 
-			if($tiles.length > 0) {
+			if($tiles.length > 1) {
 
 				$tiles.each(function(i, tile){
 					var $tile = $(tile),
@@ -1138,6 +1160,17 @@ define([
 					}
 
 				});
+			} else if($tiles.length === 1) {
+				var $video = $tiles.find('video'),
+					video;
+
+				if($video.length > 0) {
+					video = $video.get(0);
+					$tiles.addClass('is-playing');
+					video.play();
+					self.loadOrPlayVideo(video);
+					$video.on(self.videoEvents, self.onVideoReadyStateChange);
+				}
 			}
 		},
 
@@ -1169,10 +1202,14 @@ define([
 
 				$tiles.each(function(i, tile){
 					var $tile = $(tile),
-						$video = $tile.find('video');
+						$video = $tile.find('video'),
+						video;
 
 					if($video.length > 0) { 
-						$video.get(0).pause();
+						video = $video.get(0);
+						if(!video.paused) {
+							video.pause();
+						}
 						$tile.removeClass('is-playing').removeClass('is-loading');
 						$video.off(self.videoEvents, self.onVideoReadyStateChange);
 					}
@@ -1217,7 +1254,8 @@ define([
 		'momentumScrollStep',
 		'onTileImageLoad',
 		'setTileImage',
-		'setTileVideo'
+		'setTileVideo',
+		'checkAllImagesHaveLoaded'
 	);
 
 	return app;

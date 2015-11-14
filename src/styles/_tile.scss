@@ -67,7 +67,8 @@
 	}
 
 	video {
-		display: none;
+		display: block;
+		opacity: 0;
 		width: 100%;
 		position: absolute;
 		left: 0;
@@ -104,6 +105,7 @@
 
 .is-selected .tile__img-holder video {
 	display: block;
+	opacity: 1;
 }
 
 .tile:hover .tile__img-holder img {
@@ -279,35 +281,36 @@
 	-ms-box-decoration-break: clone;
 	-o-box-decoration-break: clone;
 	box-decoration-break: clone;
+	text-shadow: none !important;
 }
 
 .tile__title .tile__text-holder,
 .tile__date .tile__text-holder,
 .tile__location-text .tile__text-holder {
-	background: rgba($canada-red, 0.75);
-	color: $white;
+	background: rgba($canada-red, 0.75) !important;
+	color: $white !important;
 	box-shadow: ($text-padding * -1) 0 0 rgba($canada-red, 0.75), $text-padding 0 0 rgba($canada-red, 0.75);
 }
 
 .cat-1 .tile__description .tile__text-holder,
 .cat-1 .tile__link-item .tile__text-holder {
-	background: rgba($cat-1-color, 0.75);
+	background: rgba($cat-1-color, 0.75) !important;
 	box-shadow: ($text-padding * -1) 0 0 rgba($cat-1-color, 0.75), $text-padding 0 0 rgba($cat-1-color, 0.75);
-	color: $white;
+	color: $white !important;
 }
 
 .cat-2 .tile__description .tile__text-holder,
 .cat-2 .tile__link-item .tile__text-holder {
-	background: rgba($cat-2-color, 0.75);
+	background: rgba($cat-2-color, 0.75) !important;
 	box-shadow: ($text-padding * -1) 0 0 rgba($cat-2-color, 0.75), $text-padding 0 0 rgba($cat-2-color, 0.75);
-	color: $white;
+	color: $white !important;
 }
 
 .cat-3 .tile__description .tile__text-holder,
 .cat-3 .tile__link-item .tile__text-holder {
-	background: rgba($cat-3-color, 0.75);
+	background: rgba($cat-3-color, 0.75) !important;
 	box-shadow: ($text-padding * -1) 0 0 rgba($cat-3-color, 0.75), $text-padding 0 0 rgba($cat-3-color, 0.75);
-	color: $white;
+	color: $white !important;
 }
 
 
@@ -324,6 +327,7 @@
 	max-width: 50%;
 	text-transform: uppercase;
 	padding: 0 $text-padding;
+	margin-top: 0 !important;
 	margin-bottom: 5px;
 	@include tile-element-sizer(12, 2);
 }
@@ -331,6 +335,7 @@
 .tile__description {
 	max-width: 50%;
 	padding: 0 $text-padding;
+	margin-top: 0 !important;
 	margin-bottom: 5px;
 	font-weight: bold;
 	@include tile-element-sizer(12, 2);
@@ -348,6 +353,10 @@
 	padding: 0 $text-padding;
 	font-style: italic;
 	@include tile-element-sizer(12, 2);
+
+	&:before {
+		display: none !important;
+	}
 }
 
 .tile__link {
